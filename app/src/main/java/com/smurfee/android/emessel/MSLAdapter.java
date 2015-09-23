@@ -9,15 +9,17 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
 /**
  * Created by smurfee on 20/09/2015.
  */
 
-public class MSLAdapter extends ArrayAdapter<String> {
+public class MSLAdapter extends ArrayAdapter<MSLItem> {
     private final Context context;
-    private final String[] values;
+    private final List<MSLItem> values;
 
-    public MSLAdapter(Context context, String[] values) {
+    public MSLAdapter(Context context, List<MSLItem> values) {
         super(context, R.layout.list_row, values);
         this.context = context;
         this.values = values;
@@ -44,7 +46,7 @@ public class MSLAdapter extends ArrayAdapter<String> {
         }
         // Change the icon for Windows and iPhone
         ViewHolder holder = (ViewHolder) rowView.getTag();
-        String s = values[position];
+        String s = values.get(position).toString();
         holder.text.setText(s);
         if (s.startsWith("Windows7") || s.startsWith("iPhone")
                 || s.startsWith("Solaris")) {
