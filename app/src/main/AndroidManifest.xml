@@ -7,6 +7,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo.Light" >
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -16,6 +17,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".MSLDetailActivity"
+            android:label="@string/title_activity_msldetail" >
+        </activity>
+
+        <provider
+            android:name=".MSLContentProvider"
+            android:authorities="com.smurfee.android.emessel.contentprovider" >
+        </provider>
     </application>
 
 </manifest>

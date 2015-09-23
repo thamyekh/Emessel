@@ -16,8 +16,8 @@ public class ItemDataSource {
     // Database fields
     private SQLiteDatabase database;
     private MSLSQLiteHelper dbHelper;
-    private String[] allColumns = {MSLSQLiteHelper.COLUMN_ID,
-            MSLSQLiteHelper.COLUMN_ITEM};
+    private String[] allColumns = {MSLTable.COLUMN_ID,
+            MSLTable.COLUMN_ITEM};
 
     public ItemDataSource(Context context) {
         dbHelper = new MSLSQLiteHelper(context);
@@ -33,10 +33,10 @@ public class ItemDataSource {
 
     public MSLItem createMSLItem(String item) {
         ContentValues values = new ContentValues();
-        values.put(MSLSQLiteHelper.COLUMN_ITEM, item);
-        long insertId = database.insert(MSLSQLiteHelper.TABLE_MSL, null, values);
-        Cursor cursor = database.query(MSLSQLiteHelper.TABLE_MSL,
-                allColumns, MSLSQLiteHelper.COLUMN_ID + " = " + insertId, null,
+        values.put(MSLTable.COLUMN_ITEM, item);
+        long insertId = database.insert(MSLTable.TABLE_MSL, null, values);
+        Cursor cursor = database.query(MSLTable.TABLE_MSL,
+                allColumns, MSLTable.COLUMN_ID + " = " + insertId, null,
                 null, null, null);
         cursor.moveToFirst();
         MSLItem newMSLItem = cursorToMSLItem(cursor);
@@ -47,14 +47,14 @@ public class ItemDataSource {
     public void deleteMSLItem(MSLItem item) {
         long id = item.getId();
         System.out.println("MSLItem deleted with id: " + id);
-        database.delete(MSLSQLiteHelper.TABLE_MSL, MSLSQLiteHelper.COLUMN_ID
+        database.delete(MSLTable.TABLE_MSL, MSLTable.COLUMN_ID
                 + " = " + id, null);
     }
 
     public List<MSLItem> getAllMSLItems() {
         List<MSLItem> items = new ArrayList<MSLItem>();
 
-        Cursor cursor = database.query(MSLSQLiteHelper.TABLE_MSL,
+        Cursor cursor = database.query(MSLTable.TABLE_MSL,
                 allColumns, null, null, null, null, null);
 
         cursor.moveToFirst();
