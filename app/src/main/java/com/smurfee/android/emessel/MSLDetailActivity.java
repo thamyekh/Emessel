@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -29,7 +28,7 @@ public class MSLDetailActivity extends Activity {
 
         mCategory = (Spinner) findViewById(R.id.category);
         mTitleText = (EditText) findViewById(R.id.edit_title);
-        Button confirmButton = (Button) findViewById(R.id.edit_button);
+        Button confirmButton = (Button) findViewById(R.id.btn_confirm_edit);
 
         Bundle extras = getIntent().getExtras();
 
@@ -109,10 +108,10 @@ public class MSLDetailActivity extends Activity {
         values.put(MSLTable.COLUMN_ITEM, title);
 
         if (MSLUri == null) {
-            // New todo
+            // New MSL Item
             MSLUri = getContentResolver().insert(MSLContentProvider.CONTENT_URI, values);
         } else {
-            // Update todo
+            // Update MSL Item
             getContentResolver().update(MSLUri, values, null, null);
         }
     }

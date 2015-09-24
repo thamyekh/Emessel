@@ -11,26 +11,40 @@
         android:orientation="vertical"
         tools:context=".MainActivity">
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/add"
+            <EditText
+                android:id="@+id/txt_add_item"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add New"
-                android:onClick="onClick"/>
+                android:layout_height="60dp"
+                android:hint="@string/insert_item_long"
+                android:inputType="text"
+                android:layout_centerVertical="true" />
 
-            <Button
-                android:id="@+id/delete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Delete First"
-                android:onClick="onClick"/>
+            <ImageButton
+                android:id="@+id/btn_add_item"
+                android:layout_alignParentRight="true"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/ic_done_black_18dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:onClick="onClickAdd"
+                android:layout_centerVertical="true" />
 
-        </LinearLayout>
+            <View
+                android:layout_width="2dp"
+                android:layout_height="60dp"
+                android:layout_toLeftOf="@id/btn_add_item"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="?android:attr/listDivider" />
+        </RelativeLayout>
 
         <ListView
             android:id="@+id/listview"

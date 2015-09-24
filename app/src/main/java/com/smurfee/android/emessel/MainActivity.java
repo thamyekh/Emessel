@@ -1,11 +1,10 @@
 package com.smurfee.android.emessel;
 
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.LoaderManager;
-import android.content.ContentProvider;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -18,20 +17,28 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-import org.w3c.dom.Comment;
-
-import java.util.List;
-import java.util.Random;
+/*
+TODO:
+Convert list to ListFragment
+fix layout_width for add items xml
+FEATURES TO IMPLEMENT:
+create new shopping lists
+swipe to remove item
+Undo
+total cost
+item priority
+ */
 
 public class MainActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private View viewContainer;
     private ListView listView;
+    private EditText txtItem;
 //    private ItemDataSource dataSource;
 
     private static final int ACTIVITY_CREATE = 0;
@@ -44,6 +51,7 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         super.onCreate(icicle);
         setContentView(R.layout.activity_main);
         listView = (ListView) findViewById(R.id.listview);
+        txtItem = (EditText) findViewById(R.id.txt_add_item);
         //Using DAO as oppose to ContentProvider
 //        dataSource = new ItemDataSource(this);
 //        dataSource.open();
@@ -142,15 +150,19 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         adapter.swapCursor(null);
     }
 
+    public void onClickAdd(View view){
+        String item = txtItem.getText().toString();
+        if (item.isEmpty()) return; // Don't add nothing
+        ContentValues values = new ContentValues();
+        values.put(MSLTable.COLUMN_ITEM, item);
+        getContentResolver().insert(MSLContentProvider.CONTENT_URI, values);
+    }
     //TODO:remove?
     public void onListClick(AdapterView<?> parent, View v, int position, long id) {
-        String item = (String) listView.getAdapter().getItem(position);
-        //                Toast.makeText(getBaseContext(), item + " selected", Toast.LENGTH_LONG).show();
         Intent i = new Intent(getBaseContext(), MSLDetailActivity.class);
         Uri todoUri = Uri.parse(MSLContentProvider.CONTENT_URI + "/" + id);
         i.putExtra(MSLContentProvider.CONTENT_ITEM_TYPE, todoUri);
         startActivity(i);
-////        Toast.makeText(this, "Deletion undone", Toast.LENGTH_LONG).show();
 ////        viewContainer.setVisibility(View.GONE);
 //        ArrayAdapter<MSLItem> adapter = (ArrayAdapter<MSLItem>) listView.getAdapter();
 //        MSLItem item = null;
