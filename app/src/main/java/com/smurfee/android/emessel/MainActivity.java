@@ -18,9 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 /*
 TODO:
@@ -36,13 +34,9 @@ item priority
 
 public class MainActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private View viewContainer;
-    private ListView listView;
+//    private ListView listView;
     private EditText txtItem;
 //    private ItemDataSource dataSource;
-
-    private static final int ACTIVITY_CREATE = 0;
-    private static final int ACTIVITY_EDIT = 1;
     private static final int DELETE_ID = Menu.FIRST + 1;
 
     private SimpleCursorAdapter adapter;
@@ -50,7 +44,7 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.activity_main);
-        listView = (ListView) findViewById(R.id.listview);
+//        listView = (ListView) findViewById(R.id.listview); //TODO: move to fragment
         txtItem = (EditText) findViewById(R.id.txt_add_item);
         //Using DAO as oppose to ContentProvider
 //        dataSource = new ItemDataSource(this);
@@ -58,17 +52,17 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
 //        List<MSLItem> values = dataSource.getAllMSLItems();
 //        ArrayAdapter<MSLItem> adapter = new MSLAdapter(this, values);
 //        listView.setAdapter(adapter);
-        listView.setDividerHeight(2);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                onListClick(parent, v, position, id);
-            }
-        });
-        fillData();
-        registerForContextMenu(listView);
-        //TODO:remove?
-        viewContainer = findViewById(R.id.undobar);
+
+        //TODO: move comment block to fragment
+//        listView.setDividerHeight(2);
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+//                onListClick(parent, v, position, id);
+//            }
+//        });
+//        fillData();
+//        registerForContextMenu(listView); //TODO:refer to onContextItemSelected in this class
     }
 
     @Override
@@ -84,26 +78,24 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
             case R.id.insert:
                 addItem();
                 return true;
-            default:
-                showUndo(viewContainer);
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case DELETE_ID:
-                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
-                        .getMenuInfo();
-                Uri uri = Uri.parse(MSLContentProvider.CONTENT_URI + "/"
-                        + info.id);
-                getContentResolver().delete(uri, null, null);
-                fillData();
-                return true;
-        }
-        return super.onContextItemSelected(item);
-    }
+//    @Override
+//    public boolean onContextItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case DELETE_ID:
+//                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+//                        .getMenuInfo();
+//                Uri uri = Uri.parse(MSLContentProvider.CONTENT_URI + "/"
+//                        + info.id);
+//                getContentResolver().delete(uri, null, null);
+//                fillData();
+//                return true;
+//        }
+//        return super.onContextItemSelected(item);
+//    }
 
     //TODO: change to creating item on main activity
     private void addItem() {
@@ -111,17 +103,18 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         startActivity(i);
     }
 
-    private void fillData() {
-        // Fields from the database (projection)
-        // Must include the _id column for the adapter to work
-        String[] from = new String[]{MSLTable.COLUMN_ITEM};
-        // Fields on the UI to which we map
-        int[] to = new int[]{R.id.label};
-        getLoaderManager().initLoader(0, null, this);
-        adapter = new SimpleCursorAdapter(this, R.layout.list_row, null, from,
-                to, 0);
-        listView.setAdapter(adapter);
-    }
+    //TODO: moved to fragment
+//    private void fillData() {
+//        // Fields from the database (projection)
+//        // Must include the _id column for the adapter to work
+//        String[] from = new String[]{MSLTable.COLUMN_ITEM};
+//        // Fields on the UI to which we map
+//        int[] to = new int[]{R.id.label};
+//        getLoaderManager().initLoader(0, null, this);
+//        adapter = new SimpleCursorAdapter(this, R.layout.list_row, null, from,
+//                to, 0);
+//        listView.setAdapter(adapter);
+//    }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,

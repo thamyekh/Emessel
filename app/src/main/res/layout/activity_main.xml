@@ -46,12 +46,22 @@
                 android:background="?android:attr/listDivider" />
         </RelativeLayout>
 
+        <fragment
+            android:id="@+id/listFragment"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            class="com.smurfee.android.emessel.MSLItemFragment"
+            tools:layout="@layout/fragment_mslitem">
+        </fragment>
+        <!--
         <ListView
             android:id="@+id/listview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal|bottom">
         </ListView>
+        -->
     </LinearLayout>
 
     <LinearLayout
