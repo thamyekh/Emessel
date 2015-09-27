@@ -1,62 +1,63 @@
 package com.smurfee.android.emessel;
 
-import android.app.Activity;
-import android.content.Context;
-import android.os.Bundle;
 import android.app.Fragment;
+import android.app.LoaderManager;
+import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-
-import com.smurfee.android.emessel.dummy.DummyContent;
 
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Large screen devices (such as tablets) are supported by replacing the ListView
- * with a GridView.
- * <p/>
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class MSLItemFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class MSLItemFragment extends Fragment implements ListView.OnItemClickListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+//    private static final String ARG_PARAM1 = "param1";
+//    private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+//    private String mParam1;
+//    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
     /**
-     * The fragment's ListView/GridView.
+     * The fragment's ListView.
      */
-    private AbsListView mListView;
+    private ListView mListView;
 
     /**
-     * The Adapter which will be used to populate the ListView/GridView with
+     * The Adapter which will be used to populate the ListView with
      * Views.
      */
-    private ListAdapter mAdapter;
+    private SimpleCursorAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
-    public static MSLItemFragment newInstance(String param1, String param2) {
-        MSLItemFragment fragment = new MSLItemFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+//    public static MSLItemFragment newInstance(String param1, String param2) {
+//        MSLItemFragment fragment = new MSLItemFragment();
+//        Bundle args = new Bundle();
+//        args.putString(ARG_PARAM1, param1);
+//        args.putString(ARG_PARAM2, param2);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -68,15 +69,40 @@ public class MSLItemFragment extends Fragment implements AbsListView.OnItemClick
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//
+//        if (getArguments() != null) {
+//            mParam1 = getArguments().getString(ARG_PARAM1);
+//            mParam2 = getArguments().getString(ARG_PARAM2);
+//        }
+//
+//        mListView.setDividerHeight(2);
+//        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+//                onListClick(parent, v, position, id);
+//            }
+//        });
+//
+//        fillData();
+    }
 
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+//    public void onListClick(AdapterView<?> parent, View v, int position, long id) {
+//        Intent i = new Intent(getActivity(), MSLDetailActivity.class);
+//        Uri todoUri = Uri.parse(MSLContentProvider.CONTENT_URI + "/" + id);
+//        i.putExtra(MSLContentProvider.CONTENT_ITEM_TYPE, todoUri);
+//        startActivity(i);
+//    }
 
-        // TODO: Change Adapter to display your content
-        mAdapter = new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS);
+    private void fillData() {
+        // Fields from the database (projection)
+        // Must include the _id column for the adapter to work
+        String[] from = new String[]{MSLTable.COLUMN_ITEM};
+        // Fields on the UI to which we map
+        int[] to = new int[]{R.id.label};
+        getLoaderManager().initLoader(0, null, this);
+        mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.list_row, null, from,
+                to, 0);
+        mListView.setAdapter(mAdapter);
     }
 
     @Override
@@ -85,25 +111,23 @@ public class MSLItemFragment extends Fragment implements AbsListView.OnItemClick
         View view = inflater.inflate(R.layout.fragment_mslitem, container, false);
 
         // Set the adapter
-        mListView = (AbsListView) view.findViewById(android.R.id.list);
+        mListView = (ListView) view.findViewById(android.R.id.list);
+        mListView.setDividerHeight(2);
         ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
-
+        fillData();
         return view;
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
-        Activity activity = null;
-        if (context instanceof Activity) activity = (Activity) context;
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (OnFragmentInteractionListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
     }
@@ -119,7 +143,16 @@ public class MSLItemFragment extends Fragment implements AbsListView.OnItemClick
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
+//            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
+
+            //TODO: convert to swipe to delete
+            Uri todoUri = Uri.parse(MSLContentProvider.CONTENT_URI + "/" + id);
+            getActivity().getContentResolver().delete(todoUri, null, null);
+            // This section goes into the item details
+//            Intent i = new Intent(getActivity(), MSLDetailActivity.class);
+//            Uri todoUri = Uri.parse(MSLContentProvider.CONTENT_URI + "/" + id);
+//            i.putExtra(MSLContentProvider.CONTENT_ITEM_TYPE, todoUri);
+//            startActivity(i);
         }
     }
 
@@ -151,4 +184,22 @@ public class MSLItemFragment extends Fragment implements AbsListView.OnItemClick
         public void onFragmentInteraction(String id);
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = {MSLTable.COLUMN_ID, MSLTable.COLUMN_ITEM};
+        CursorLoader cursorLoader = new CursorLoader(getActivity(),
+                MSLContentProvider.CONTENT_URI, projection, null, null, null);
+        return cursorLoader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        // data is not available anymore, delete reference
+        mAdapter.swapCursor(null);
+    }
 }
