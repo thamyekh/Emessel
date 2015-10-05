@@ -48,11 +48,10 @@
 
         <fragment
             android:id="@+id/listFragment"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_weight="1"
-            android:layout_height="match_parent"
-            class="com.smurfee.android.emessel.MSLItemFragment"
-            tools:layout="@layout/fragment_mslitem">
+            android:layout_height="0dp"
+            class="com.smurfee.android.emessel.MSLItemFragment">
         </fragment>
         <!--
         <ListView
@@ -64,7 +63,7 @@
         -->
     </LinearLayout>
 
-    <LinearLayout
+    <!--LinearLayout
         android:id="@+id/undobar"
         android:visibility="gone"
         android:layout_width="wrap_content"
@@ -95,5 +94,5 @@
             android:text="Undo"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#fff" />
-    </LinearLayout>
+    </LinearLayout-->
 </FrameLayout>

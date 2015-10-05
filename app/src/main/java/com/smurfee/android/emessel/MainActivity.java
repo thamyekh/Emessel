@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,7 +33,8 @@ total cost
 item priority
  */
 
-public class MainActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor>,
+        MSLItemFragment.OnFragmentInteractionListener{
 
 //    private ListView listView;
     private EditText txtItem;
@@ -116,12 +118,12 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
 //        listView.setAdapter(adapter);
 //    }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, DELETE_ID, 0, R.string.delete_item);
-    }
+//    @Override
+//    public void onCreateContextMenu(ContextMenu menu, View v,
+//                                    ContextMenu.ContextMenuInfo menuInfo) {
+//        super.onCreateContextMenu(menu, v, menuInfo);
+//        menu.add(0, DELETE_ID, 0, R.string.delete_item);
+//    }
 
     // creates a new loader after the initLoader () call
     @Override
@@ -211,5 +213,9 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
     protected void onPause() {
 //        dataSource.close();
         super.onPause();
+    }
+
+    @Override
+    public void onFragmentInteraction(String id) {
     }
 }

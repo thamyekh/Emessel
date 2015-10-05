@@ -1,4 +1,4 @@
-package com.smurfee.android.emessel;
+package com.smurfee.android.emessel.unused;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.smurfee.android.emessel.MSLItem;
+import com.smurfee.android.emessel.R;
 
 import java.util.List;
 
@@ -43,16 +46,6 @@ public class MSLAdapter extends ArrayAdapter<MSLItem> {
             viewHolder.image = (ImageView) rowView
                     .findViewById(R.id.icon);
             rowView.setTag(viewHolder);
-        }
-        // Change the icon for Windows and iPhone
-        ViewHolder holder = (ViewHolder) rowView.getTag();
-        String s = values.get(position).toString();
-        holder.text.setText(s);
-        if (s.startsWith("Windows7") || s.startsWith("iPhone")
-                || s.startsWith("Solaris")) {
-            holder.image.setImageResource(R.drawable.no);
-        } else {
-            holder.image.setImageResource(R.drawable.ok);
         }
 
         return rowView;

@@ -7,6 +7,6 @@
     For more on layout aliases, see:
     http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
     -->
-    <item name="fragment_mslitem" type="layout">@layout/fragment_mslitem_grid</item>
+    <item name="fragment_mslitem" type="layout">@layout/fragment_mslitem_list</item>
 
 </resources>

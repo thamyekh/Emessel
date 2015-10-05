@@ -1,10 +1,15 @@
-package com.smurfee.android.emessel;
+package com.smurfee.android.emessel.unused;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.smurfee.android.emessel.MSLItem;
+import com.smurfee.android.emessel.MSLSQLiteHelper;
+import com.smurfee.android.emessel.MSLTable;
+
 import java.util.ArrayList;
 import java.util.List;
 
