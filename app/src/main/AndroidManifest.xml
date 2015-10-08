@@ -24,7 +24,7 @@
         </activity>
 
         <provider
-            android:name=".MSLContentProvider"
+            android:name=".db.MSLContentProvider"
             android:authorities="com.smurfee.android.emessel.contentprovider" >
         </provider>
     </application>

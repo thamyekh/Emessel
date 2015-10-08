@@ -3,8 +3,6 @@ package com.smurfee.android.emessel.db;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.smurfee.android.emessel.MSLSQLiteHelper;
-
 /**
  * Created by smurfee on 23/09/2015.
  */

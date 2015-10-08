@@ -3,8 +3,6 @@ package com.smurfee.android.emessel.db;
 /**
  * Created by smurfee on 23/09/2015.
  */
-import java.util.Arrays;
-import java.util.HashSet;
 
 import android.content.ContentProvider;
 import android.content.ContentResolver;
@@ -16,8 +14,8 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.smurfee.android.emessel.db.MSLSQLiteHelper;
-import com.smurfee.android.emessel.db.MSLTable;
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class MSLContentProvider extends ContentProvider {
 

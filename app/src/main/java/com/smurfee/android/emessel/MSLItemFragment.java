@@ -4,19 +4,21 @@ import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.net.Uri;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+
+import com.smurfee.android.emessel.db.MSLContentProvider;
+import com.smurfee.android.emessel.db.MSLCursorAdapter;
+import com.smurfee.android.emessel.db.MSLSQLiteHelper;
+import com.smurfee.android.emessel.db.MSLTable;
 
 /**
  * A fragment representing a list of Items.
@@ -47,7 +49,7 @@ public class MSLItemFragment extends Fragment implements ListView.OnItemClickLis
      * The Adapter which will be used to populate the ListView with
      * Views.
      */
-    private SimpleCursorAdapter mAdapter;
+    private MSLCursorAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
 //    public static MSLItemFragment newInstance(String param1, String param2) {
@@ -69,29 +71,12 @@ public class MSLItemFragment extends Fragment implements ListView.OnItemClickLis
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//
+
 //        if (getArguments() != null) {
 //            mParam1 = getArguments().getString(ARG_PARAM1);
 //            mParam2 = getArguments().getString(ARG_PARAM2);
 //        }
-//
-//        mListView.setDividerHeight(2);
-//        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-//                onListClick(parent, v, position, id);
-//            }
-//        });
-//
-//        fillData();
     }
-
-//    public void onListClick(AdapterView<?> parent, View v, int position, long id) {
-//        Intent i = new Intent(getActivity(), MSLDetailActivity.class);
-//        Uri todoUri = Uri.parse(MSLContentProvider.CONTENT_URI + "/" + id);
-//        i.putExtra(MSLContentProvider.CONTENT_ITEM_TYPE, todoUri);
-//        startActivity(i);
-//    }
 
     private void fillData() {
         // Fields from the database (projection)
@@ -100,8 +85,15 @@ public class MSLItemFragment extends Fragment implements ListView.OnItemClickLis
         // Fields on the UI to which we map
         int[] to = new int[]{R.id.label};
         getLoaderManager().initLoader(0, null, this);
-        mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.list_row, null, from,
-                to, 0);
+//        mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.list_row, null, from,
+//                to, 0);
+        // TodoDatabaseHandler is a SQLiteOpenHelper class connecting to SQLite
+        MSLSQLiteHelper handler = new MSLSQLiteHelper(getActivity());
+        // Get access to the underlying writeable database
+        SQLiteDatabase db = handler.getWritableDatabase();
+        // Query for items from the database and get a cursor back
+        Cursor c = db.rawQuery("SELECT  * FROM " + MSLTable.TABLE_MSL, null);
+        mAdapter = new MSLCursorAdapter(getActivity(), c, 0);
         mListView.setAdapter(mAdapter);
     }
 
@@ -113,7 +105,7 @@ public class MSLItemFragment extends Fragment implements ListView.OnItemClickLis
         // Set the adapter
         mListView = (ListView) view.findViewById(android.R.id.list);
         mListView.setDividerHeight(2);
-        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
+        mListView.setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
@@ -144,11 +136,14 @@ public class MSLItemFragment extends Fragment implements ListView.OnItemClickLis
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
 //            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
+            mAdapter.setSelected(position);
+            mAdapter.notifyDataSetChanged();
+            //TODO: delete item on touch
+//            Uri todoUri = Uri.parse(MSLContentProvider.CONTENT_URI + "/" + id);
+//            getActivity().getContentResolver().delete(todoUri, null, null);
 
-            //TODO: convert to swipe to delete
-            Uri todoUri = Uri.parse(MSLContentProvider.CONTENT_URI + "/" + id);
-            getActivity().getContentResolver().delete(todoUri, null, null);
-            // This section goes into the item details
+
+            //TODO: This section goes into the item details
 //            Intent i = new Intent(getActivity(), MSLDetailActivity.class);
 //            Uri todoUri = Uri.parse(MSLContentProvider.CONTENT_URI + "/" + id);
 //            i.putExtra(MSLContentProvider.CONTENT_ITEM_TYPE, todoUri);
@@ -181,7 +176,7 @@ public class MSLItemFragment extends Fragment implements ListView.OnItemClickLis
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(String id);
+        void onFragmentInteraction(String id);
     }
 
     @Override

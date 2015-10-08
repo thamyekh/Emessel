@@ -6,9 +6,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.smurfee.android.emessel.MSLItem;
-import com.smurfee.android.emessel.MSLSQLiteHelper;
-import com.smurfee.android.emessel.MSLTable;
+import com.smurfee.android.emessel.db.MSLItem;
+import com.smurfee.android.emessel.db.MSLSQLiteHelper;
+import com.smurfee.android.emessel.db.MSLTable;
 
 import java.util.ArrayList;
 import java.util.List;

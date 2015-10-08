@@ -9,8 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.smurfee.android.emessel.MSLItem;
 import com.smurfee.android.emessel.R;
+import com.smurfee.android.emessel.db.MSLItem;
 
 import java.util.List;
 

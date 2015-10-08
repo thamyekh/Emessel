@@ -14,6 +14,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.smurfee.android.emessel.db.MSLContentProvider;
+import com.smurfee.android.emessel.db.MSLTable;
+
 public class MSLDetailActivity extends Activity {
 
     private Spinner mCategory;
