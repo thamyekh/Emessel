@@ -1,20 +1,18 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusable="true"
-    android:focusableInTouchMode="true" >
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
 
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".MainActivity" >
+    <include
+        android:id="@+id/app_bar"
+        layout="@layout/app_bar" />
 
         <RelativeLayout
             android:id="@+id/group"
+            android:layout_below="@+id/app_bar"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -23,78 +21,37 @@
                 android:id="@+id/txt_add_item"
                 android:layout_width="wrap_content"
                 android:layout_height="60dp"
+                android:layout_centerVertical="true"
                 android:hint="@string/insert_item_long"
-                android:inputType="text"
-                android:layout_centerVertical="true" />
+                android:inputType="text" />
 
             <ImageButton
                 android:id="@+id/btn_add_item"
-                android:layout_alignParentRight="true"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/ic_done_black_18dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
                 android:background="?android:attr/selectableItemBackground"
                 android:onClick="onClickAdd"
-                android:layout_centerVertical="true" />
+                android:src="@drawable/ic_done_black_18dp" />
 
             <View
                 android:layout_width="2dp"
                 android:layout_height="60dp"
-                android:layout_toLeftOf="@id/btn_add_item"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_toLeftOf="@id/btn_add_item"
                 android:background="?android:attr/listDivider" />
         </RelativeLayout>
 
         <fragment
+            android:layout_below="@+id/group"
             android:id="@+id/listFragment"
+            class="com.smurfee.android.emessel.MSLItemFragment"
             android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="0dp"
-            class="com.smurfee.android.emessel.MSLItemFragment">
-        </fragment>
-        <!--
-        <ListView
-            android:id="@+id/listview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal|bottom">
-        </ListView>
-        -->
-    </LinearLayout>
+            android:layout_height="fill_parent"
+            android:layout_weight="1" />
 
-    <!--LinearLayout
-        android:id="@+id/undobar"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_margin="20dp"
-        android:alpha="100"
-        android:background="#808080"
-        android:dividerPadding="11dp"
-        android:padding="4dp" >
-
-        <TextView
-            android:id="@+id/undobar_message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Deleted"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#fff" />
-
-        <Button
-            android:id="@+id/undobar_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:onClick="onClick"
-            android:background="#808080"
-            android:drawableLeft="@drawable/ic_undobar_undo"
-            android:text="Undo"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#fff" />
-    </LinearLayout-->
-</FrameLayout>
+</RelativeLayout>

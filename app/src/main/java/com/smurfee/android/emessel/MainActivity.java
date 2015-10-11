@@ -2,18 +2,19 @@ package com.smurfee.android.emessel;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.smurfee.android.emessel.db.MSLContentProvider;
 import com.smurfee.android.emessel.db.MSLTable;
@@ -29,9 +30,10 @@ total cost
 item priority
  */
 
-public class MainActivity extends Activity implements MSLItemFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements MSLItemFragment.OnFragmentInteractionListener {
 
     private EditText txtItem;
+    private Toolbar toolbar;
     private static final int DELETE_ID = Menu.FIRST + 1; //TODO:refer to onContextItemSelected in this class
 
     public void onCreate(Bundle icicle) {
@@ -40,22 +42,15 @@ public class MainActivity extends Activity implements MSLItemFragment.OnFragment
         txtItem = (EditText) findViewById(R.id.txt_add_item);
 
         //TODO: update actionbar to toolbar
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setIcon(R.drawable.ic_done_black_18dp);
-        // add the custom view to the action bar
-        LayoutInflater inflator = (LayoutInflater) this .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View v = inflator.inflate(R.layout.actionbar_view, null);
-        actionBar.setCustomView(v);
+        toolbar = (Toolbar) findViewById(R.id.app_bar);
+        setSupportActionBar(toolbar);
 //        registerForContextMenu(listView); //TODO:refer to onContextItemSelected in this class
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -64,6 +59,10 @@ public class MainActivity extends Activity implements MSLItemFragment.OnFragment
         switch (item.getItemId()) {
             case R.id.insert:
                 addItem();
+                return true;
+            case R.id.delete_checked:
+                Toast toast = Toast.makeText(getApplicationContext(), "test", Toast.LENGTH_SHORT);
+                toast.show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
