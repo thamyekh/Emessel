@@ -1,13 +1,18 @@
 package com.smurfee.android.emessel;
 
-import android.app.Fragment;
+import android.app.ListFragment;
 import android.app.LoaderManager;
+import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
+import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.RemoteException;
+import android.util.SparseArray;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,62 +25,31 @@ import com.smurfee.android.emessel.db.MSLCursorAdapter;
 import com.smurfee.android.emessel.db.MSLSQLiteHelper;
 import com.smurfee.android.emessel.db.MSLTable;
 
+import java.util.ArrayList;
+
 /**
  * A fragment representing a list of Items.
  * <p/>
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class MSLItemFragment extends Fragment implements ListView.OnItemClickListener,
-        LoaderManager.LoaderCallbacks<Cursor> {
+public class MSListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-//    private static final String ARG_PARAM1 = "param1";
-//    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-//    private String mParam1;
-//    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
-    /**
-     * The fragment's ListView.
-     */
     private ListView mListView;
-
-    /**
-     * The Adapter which will be used to populate the ListView with
-     * Views.
-     */
     private MSLCursorAdapter mAdapter;
-
-    // TODO: Rename and change types of parameters
-//    public static MSLItemFragment newInstance(String param1, String param2) {
-//        MSLItemFragment fragment = new MSLItemFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public MSLItemFragment() {
+    public MSListFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        if (getArguments() != null) {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
     }
 
     private void fillData() {
@@ -85,8 +59,6 @@ public class MSLItemFragment extends Fragment implements ListView.OnItemClickLis
         // Fields on the UI to which we map
         int[] to = new int[]{R.id.label};
         getLoaderManager().initLoader(0, null, this);
-//        mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.list_row, null, from,
-//                to, 0);
         // TodoDatabaseHandler is a SQLiteOpenHelper class connecting to SQLite
         MSLSQLiteHelper handler = new MSLSQLiteHelper(getActivity());
         // Get access to the underlying writeable database
@@ -108,9 +80,21 @@ public class MSLItemFragment extends Fragment implements ListView.OnItemClickLis
         mListView.setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
-        mListView.setOnItemClickListener(this);
+//        mListView.setOnItemClickListener(this);
         fillData();
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onActivityCreated(savedInstanceState);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                onMSLItemClick(parent, view, position, id);
+            }
+        });
     }
 
     @Override
@@ -130,13 +114,14 @@ public class MSLItemFragment extends Fragment implements ListView.OnItemClickLis
         mListener = null;
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != mListener) {
+    public void onMSLItemClick(AdapterView<?> parent, View view, int position, long id) {
+        System.out.println("test");
+//        if (null != mListener) {
+            System.out.println("test2");
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
 //            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
-            mAdapter.setSelected(position);
+            mAdapter.setSelected(position, id);
             mAdapter.notifyDataSetChanged();
             //TODO: delete item on touch
 //            Uri todoUri = Uri.parse(MSLContentProvider.CONTENT_URI + "/" + id);
@@ -148,7 +133,7 @@ public class MSLItemFragment extends Fragment implements ListView.OnItemClickLis
 //            Uri todoUri = Uri.parse(MSLContentProvider.CONTENT_URI + "/" + id);
 //            i.putExtra(MSLContentProvider.CONTENT_ITEM_TYPE, todoUri);
 //            startActivity(i);
-        }
+//        }
     }
 
     /**
@@ -162,6 +147,36 @@ public class MSLItemFragment extends Fragment implements ListView.OnItemClickLis
         if (emptyView instanceof TextView) {
             ((TextView) emptyView).setText(emptyText);
         }
+    }
+
+    /**
+     * When the delete checked item icon in the toolbar is checked this method is called to removed
+     * the checked items
+     */
+    public void deleteCheckedItems() {
+
+        ArrayList<ContentProviderOperation> operations = new ArrayList<ContentProviderOperation>();
+        ContentProviderOperation operation;
+        SparseBooleanArray selected = mAdapter.getSelectionArray();
+        SparseArray<Long> selectedId = mAdapter.getSelectedIdArray();
+        for (int i = 0; i < selected.size(); i++) {
+            if (selected.get(selected.keyAt(i))) {
+                String[] selectionArgs = new String[]{selectedId.get(selectedId.keyAt(i)).toString()};
+                operation = ContentProviderOperation
+                        .newDelete(MSLContentProvider.CONTENT_URI)
+                        .withSelection(MSLTable.COLUMN_ID + " = ?", selectionArgs)
+                        .build();
+                operations.add(operation);
+            }
+        }
+
+        try {
+            getActivity().getContentResolver().applyBatch(MSLContentProvider.AUTHORITY, operations);
+        } catch (RemoteException e) {
+        } catch (OperationApplicationException e) {
+        }
+
+        mAdapter.resetSelection();
     }
 
     /**

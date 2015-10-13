@@ -25,7 +25,7 @@ public class MSLContentProvider extends ContentProvider {
     private static final int MSL = 10;
     private static final int MSL_ID = 20;
 
-    private static final String AUTHORITY = "com.smurfee.android.emessel.contentprovider";
+    public static final String AUTHORITY = "com.smurfee.android.emessel.contentprovider";
 
     private static final String BASE_PATH = "msl";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
@@ -87,7 +87,6 @@ public class MSLContentProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         int uriType = sURIMatcher.match(uri);
         SQLiteDatabase sqlDB = database.getWritableDatabase();
-        int rowsDeleted = 0;
         long id = 0;
         switch (uriType) {
             case MSL:
