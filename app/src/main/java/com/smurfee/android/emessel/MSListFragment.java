@@ -53,11 +53,6 @@ public class MSListFragment extends ListFragment implements LoaderManager.Loader
     }
 
     private void fillData() {
-        // Fields from the database (projection)
-        // Must include the _id column for the adapter to work
-        String[] from = new String[]{MSLTable.COLUMN_ITEM};
-        // Fields on the UI to which we map
-        int[] to = new int[]{R.id.label};
         getLoaderManager().initLoader(0, null, this);
         // TodoDatabaseHandler is a SQLiteOpenHelper class connecting to SQLite
         MSLSQLiteHelper handler = new MSLSQLiteHelper(getActivity());

@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusable="true"
@@ -46,11 +47,12 @@
     </RelativeLayout>
 
     <fragment
-        android:id="@+id/listFragment"
-        class="com.smurfee.android.emessel.MSListFragment"
+        android:id="@+id/recycler_msl"
+        class="com.smurfee.android.emessel.recyclerview.MSLRecyclerViewFragment"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:layout_below="@+id/group"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        tools:layout="@layout/fragment_mslrecycler_view" />
 
 </RelativeLayout>
