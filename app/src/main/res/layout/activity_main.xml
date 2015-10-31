@@ -47,8 +47,8 @@
     </RelativeLayout>
 
     <fragment
-        android:id="@+id/recycler_msl"
-        class="com.smurfee.android.emessel.recyclerview.MSLRecyclerViewFragment"
+        android:name="com.smurfee.android.emessel.recyclerview.MSLRecyclerViewFragment"
+        android:id="@+id/fragment_recycler_msl"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:layout_below="@+id/group"

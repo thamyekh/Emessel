@@ -4,41 +4,55 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.smurfee.android.emessel.R;
-import com.smurfee.android.emessel.db.MSLItem;
 import com.smurfee.android.emessel.db.MSLTable;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by smurfee on 12/10/2015.
  */
 public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHolder> {
 
-    private LayoutInflater mInflater;
-    private List<MSLItem> mDataset;
+    private List<MSLRowView> mRows;
+    Set<Long> mDeleteSet = new LinkedHashSet();
     private Cursor mCursor;
     private DataSetObserver mDataSetObserver;
     private boolean mDataValid;
     private int mRowIdColumn;
-    private Context mContext;
 
-    public MSLViewAdapter(Context context, List<MSLItem> dataset) {
-        mInflater = LayoutInflater.from(context);
-        mDataset = dataset;
+    public MSLViewAdapter(Context context, Cursor cursor) {
+        populate(cursor);
         mRowIdColumn = mDataValid ? mCursor.getColumnIndex(MSLTable.COLUMN_ID) : -1;
         mDataSetObserver = new MSLDataSetObserver();
         if (mCursor != null) {
             mCursor.registerDataSetObserver(mDataSetObserver);
         }
-        mContext = context;
+    }
+
+    public void populate(Cursor cursor){
+        mRows = new ArrayList<>();
+        if (cursor != null && cursor.moveToPosition(0)) {
+            MSLRowView mslItem;
+            while (!cursor.isAfterLast()) {
+                long id = cursor.getLong(cursor.getColumnIndex(MSLTable.COLUMN_ID));
+                String item = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_ITEM));
+                mslItem = new MSLRowView(id, item);
+                mRows.add(mslItem);
+                cursor.moveToNext();
+            }
+        }
+//        cursor.close();
     }
 
     @Override
@@ -51,17 +65,18 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        MSLItem current = mDataset.get(position);
+        MSLRowView current = mRows.get(position);
         holder.item.setText(current.getItem());
+
+        boolean isChecked = mRows.get(position).isChecked();
+
+        if (isChecked) holder.itemView.setSelected(true);
+        else holder.itemView.setSelected(false);
     }
 
     @Override
     public int getItemCount() {
-//        return mDataset.size(); TODO remove if adding works
-        if (mDataValid && mCursor != null) {
-            return mCursor.getCount()+1;
-        }
-        return 0;
+        return mRows.size();
     }
 
     public void changeCursor(Cursor cursor) {
@@ -73,7 +88,6 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         final Cursor oldCursor = mCursor;
         if (oldCursor != null && mDataSetObserver != null) {
             oldCursor.unregisterDataSetObserver(mDataSetObserver);
-            oldCursor.close();
         }
 
         mCursor = cursor;
@@ -83,22 +97,24 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             }
             mRowIdColumn = cursor.getColumnIndexOrThrow(MSLTable.COLUMN_ID);
             mDataValid = true;
+            int count = mCursor.getCount();
             //Add item
-            if (mCursor.moveToLast()) { //TODO: this condition will cause delete to fail
-                MSLItem item = new MSLItem();
-                String result = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_ITEM));
-                Toast.makeText(mContext, result, Toast.LENGTH_SHORT).show(); // TODO: remove debug
-                item.setItem(result);
-                item.setId(cursor.getLong(cursor.getColumnIndex(MSLTable.COLUMN_ID)));
-                mDataset.add(mDataset.size(), item);
-                notifyItemInserted(mDataset.size()+1);
+            if (mCursor.moveToPosition(count-1) && count > mRows.size()) {
+                String itemStr = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_ITEM));
+                long itemId = cursor.getLong(cursor.getColumnIndex(MSLTable.COLUMN_ID));
+                MSLRowView item = new MSLRowView(itemId, itemStr);
+                mRows.add(0, item);
+                notifyItemInserted(0);
+            } else { //Deleted item(s)
+                populate(mCursor);
+                notifyDataSetChanged();
             }
         } else {
             mRowIdColumn = -1;
             mDataValid = false;
             notifyDataSetChanged();
         }
-
+        if (oldCursor != null) oldCursor.close();
     }
 
     @Override
@@ -112,6 +128,24 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     @Override
     public void setHasStableIds(boolean hasStableIds) {
         super.setHasStableIds(true);
+    }
+
+    public void toggleChecked(View view, int position) {
+        MSLRowView row = mRows.get(position);
+        boolean checked = row.isChecked();
+
+        if (checked) mDeleteSet.remove(row.getId());
+        else mDeleteSet.add(row.getId());
+        row.setChecked(!checked);
+        notifyItemChanged(position);
+    }
+
+    public Set<Long> getSelectedRows() {
+        return mDeleteSet;
+    }
+
+    public void setSelectedRows(Set<Long> newSet) {
+        mDeleteSet = newSet;
     }
 
     private class MSLDataSetObserver extends DataSetObserver {

@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity /*implements MSListFragment.
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         FragmentManager fm = getSupportFragmentManager();
-        fragment = (MSLRecyclerViewFragment) fm.findFragmentById(R.id.recycler_msl);
+        fragment = (MSLRecyclerViewFragment) fm.findFragmentById(R.id.fragment_recycler_msl);
     }
 
     @Override
@@ -65,13 +65,7 @@ public class MainActivity extends AppCompatActivity /*implements MSListFragment.
     }
 
     public void removeItems() {
-//        MSListFragment listFragment = (MSListFragment) getFragmentManager().findFragmentById(R.id.listFragment);
-//        if (null != listFragment && listFragment.isInLayout()) {
-//            listFragment.deleteItems();
-//        }
-        if (null != fragment && fragment.isInLayout()) {
-            fragment.deleteItems();
-        }
+        if (fragment != null && fragment.isInLayout()) fragment.deleteItems(this);
     }
 
     public void onClickAdd(View view) {

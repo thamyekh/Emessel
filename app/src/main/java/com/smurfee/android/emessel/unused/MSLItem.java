@@ -1,4 +1,4 @@
-package com.smurfee.android.emessel.db;
+package com.smurfee.android.emessel.unused;
 
 /**
  * Created by smurfee on 20/09/2015.
