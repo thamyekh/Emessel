@@ -18,11 +18,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".MSLDetailActivity"
-            android:label="@string/title_activity_msldetail" >
-        </activity>
-
         <provider
             android:name=".db.MSLContentProvider"
             android:authorities="com.smurfee.android.emessel.contentprovider" >

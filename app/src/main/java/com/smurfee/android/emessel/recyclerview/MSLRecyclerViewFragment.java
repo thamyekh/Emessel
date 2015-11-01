@@ -56,13 +56,13 @@ public class MSLRecyclerViewFragment extends Fragment
         SQLiteDatabase db = handler.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT  * FROM " + MSLTable.TABLE_MSL, null);
 
-        mAdapter = new MSLViewAdapter(getActivity(), cursor);
+        mAdapter = new MSLViewAdapter(cursor);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addOnItemTouchListener(new MSLTouchListener(getActivity(), mRecyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                mAdapter.toggleChecked(view, position);
+                mAdapter.toggleChecked(position);
             }
 
             @Override
@@ -76,7 +76,7 @@ public class MSLRecyclerViewFragment extends Fragment
         return layout;
     }
 
-    public void addItem(Context context, String item) {
+    public void addItemToDatabase(Context context, String item) {
         ContentValues values = new ContentValues();
         values.put(MSLTable.COLUMN_ITEM, item);
         context.getContentResolver().insert(MSLContentProvider.CONTENT_URI, values);
@@ -132,7 +132,7 @@ public class MSLRecyclerViewFragment extends Fragment
     public static class MSLTouchListener implements RecyclerView.OnItemTouchListener {
 
         private ClickListener mClickListener;
-        private RecyclerView mRecyclerView;
+        private RecyclerView mRecyclerView; //TODO: for long press
         private GestureDetector mGestureDetector;
 
         public MSLTouchListener(Context context, final RecyclerView recyclerView, final ClickListener clickListener) {
@@ -177,8 +177,8 @@ public class MSLRecyclerViewFragment extends Fragment
     }
 
     public interface ClickListener {
-        public void onClick(View view, int position);
+        void onClick(View view, int position);
 
-        public void onLongClick(View view, int position);
+        void onLongClick(View view, int position);
     }
 }
