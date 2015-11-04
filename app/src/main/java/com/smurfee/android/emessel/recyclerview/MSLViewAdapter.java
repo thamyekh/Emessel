@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.smurfee.android.emessel.R;
@@ -32,12 +33,13 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     private DataSetObserver mDataSetObserver;
     private boolean mDataValid;
     private int mRowIdColumn;
+    private int mExpandedPosition = -1;
 
-    private List<MSLRowView> mRows;
+    private List<MSLRowView> mRows = new ArrayList<>();
     private Set<Long> mDeleteSet = new LinkedHashSet<>();
 
     public MSLViewAdapter(Cursor cursor) {
-        populate(cursor);
+//        populate(cursor);
         mRowIdColumn = mDataValid ? mCursor.getColumnIndex(MSLTable.COLUMN_ID) : -1;
         mDataSetObserver = new MSLDataSetObserver();
         if (mCursor != null) {
@@ -61,6 +63,12 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         boolean isChecked = mRows.get(position).isChecked();
         if (isChecked) holder.itemView.setSelected(true);
         else holder.itemView.setSelected(false);
+
+        if (position == mExpandedPosition) {
+            holder.expandable.setVisibility(View.VISIBLE);
+        } else {
+            holder.expandable.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -85,7 +93,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     }
 
     /**
-     * Populates the Recycler View with all rows in the cursor.
+     * Populates the Recycler View with all rows in the cursor from scratch.
      *
      * @param cursor Cursor containing all records queried from the database
      */
@@ -106,7 +114,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     /**
      * Marks the row at position as checked in the Recycler View. Only checked rows can be removed.
      *
-     * @param position
+     * @param position Clicked position.
      */
     public void toggleChecked(int position) {
         MSLRowView row = mRows.get(position);
@@ -149,7 +157,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             mRowIdColumn = cursor.getColumnIndexOrThrow(MSLTable.COLUMN_ID);
             mDataValid = true;
             int count = mCursor.getCount();
-            if (mCursor.moveToPosition(count - 1) && count > mRows.size()) {
+            if (mCursor.moveToPosition(count - 1) && count == (mRows.size() + 1)) {
                 // Add item
                 String itemStr = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_ITEM));
                 long itemId = cursor.getLong(cursor.getColumnIndex(MSLTable.COLUMN_ID));
@@ -167,6 +175,14 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             notifyDataSetChanged();
         }
         if (oldCursor != null) oldCursor.close();
+    }
+
+    public int getExpandedPosition() {
+        return mExpandedPosition;
+    }
+
+    public void setExpandedPosition(int expandedPosition) {
+        mExpandedPosition = expandedPosition;
     }
 
     private class MSLDataSetObserver extends DataSetObserver {
@@ -188,11 +204,13 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView item;
         ImageView icon;
+        LinearLayout expandable;
 
         public ViewHolder(View itemView) {
             super(itemView);
             item = (TextView) itemView.findViewById(R.id.label);
             icon = (ImageView) itemView.findViewById(R.id.icon);
+            expandable = (LinearLayout) itemView.findViewById(R.id.expandable);
         }
     }
 }

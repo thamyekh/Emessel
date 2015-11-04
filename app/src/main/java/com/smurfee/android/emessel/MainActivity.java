@@ -11,9 +11,14 @@ import android.widget.EditText;
 
 import com.smurfee.android.emessel.recyclerview.MSLRecyclerViewFragment;
 
-/*
-TODO:
-expand recycler view row to edit details
+/**
+ * TODO(s):
+ * fill expanded area with database data
+ * change textview to editview
+ * make next button in keyboard do something else
+ * replace placeholder icons with something better
+ *
+ *
  */
 
 public class MainActivity extends AppCompatActivity {

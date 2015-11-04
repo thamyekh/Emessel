@@ -6,7 +6,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
@@ -14,17 +13,12 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.smurfee.android.emessel.R;
 import com.smurfee.android.emessel.db.MSLContentProvider;
-import com.smurfee.android.emessel.db.MSLSQLiteHelper;
 import com.smurfee.android.emessel.db.MSLTable;
 
 import java.util.ArrayList;
@@ -32,7 +26,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * A simple {@link Fragment} subclass.
+ * A {@link Fragment} class used to hold a RecylerView to display Shopping List items.
+ *
+ * @author smurfee
+ * @version 2015.11.1
  */
 public class MSLRecyclerViewFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -47,35 +44,55 @@ public class MSLRecyclerViewFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_mslrecycler_view, container, false);
         mRecyclerView = (RecyclerView) layout.findViewById(R.id.recycler_msl);
 
-//      // Connecting to SQLite, get writable db and query all items
-        MSLSQLiteHelper handler = new MSLSQLiteHelper(getActivity());
-        SQLiteDatabase db = handler.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT  * FROM " + MSLTable.TABLE_MSL, null);
-
-        mAdapter = new MSLViewAdapter(cursor);
+        mAdapter = new MSLViewAdapter(null);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addOnItemTouchListener(new MSLTouchListener(getActivity(), mRecyclerView, new ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                mAdapter.toggleChecked(position);
-            }
+        mRecyclerView.addOnItemTouchListener(new TouchListener(getActivity(), mRecyclerView,
+                new TouchListener.ClickListener() {
+                    @Override
+                    public void onClick(View view, int position) {
+                        int expandPosition = mAdapter.getExpandedPosition();
+                        if (expandPosition >= 0 && expandPosition == position) {
+                            mAdapter.setExpandedPosition(-1);
+                            mAdapter.notifyItemChanged(position);
+                            return;
+                        }
+                        mAdapter.toggleChecked(position);
+                    }
 
-            @Override
-            public void onLongClick(View view, int position) {
-                //Start activity to edit item details
-                Toast.makeText(getActivity(), "long pos: " + position, Toast.LENGTH_SHORT).show();
-            }
-        }));
+                    @Override
+                    public void onLongClick(View view, int position) {
+                        //http://stackoverflow.com/questions/27203817/recyclerview-expand-collapse-items
+                        int expandedPosition = mAdapter.getExpandedPosition();
+                        if (expandedPosition >= 0) {
+                            int prev = expandedPosition;
+                            mAdapter.notifyItemChanged(prev);
+                        }
+                        mAdapter.setExpandedPosition(position);
+                        mAdapter.notifyItemChanged(position);
+
+                        int[] xy = new int[2];
+                        view.getLocationInWindow(xy);
+                        float d = getActivity().getResources().getDisplayMetrics().density;
+                        int offset = (int) ((150 * d) + 0.5f);
+                        mRecyclerView.smoothScrollBy(0, (xy[1] - (offset)));
+                    }
+                }));
         getLoaderManager().initLoader(0, null, this);
-        db.close();
+//        db.close();
         return layout;
     }
 
+    /**
+     * Create a record and insert it into the database, the {@link CursorLoader} will update the view
+     * asynchronously.
+     *
+     * @param context
+     * @param item
+     */
     public void addItemToDatabase(Context context, String item) {
         ContentValues values = new ContentValues();
         values.put(MSLTable.COLUMN_ITEM, item);
@@ -84,7 +101,9 @@ public class MSLRecyclerViewFragment extends Fragment
 
     /**
      * When the delete checked item icon in the toolbar is checked this method is called to removed
-     * the checked items
+     * the checked items.
+     *
+     * @param context Parent Activity used to get a Content Resolver.
      */
     public void deleteItems(Context context) {
         ArrayList<ContentProviderOperation> operations = new ArrayList<ContentProviderOperation>();
@@ -107,15 +126,14 @@ public class MSLRecyclerViewFragment extends Fragment
         } catch (OperationApplicationException e) {
         }
 
-        mAdapter.setSelectedRows(new LinkedHashSet());
+        mAdapter.setSelectedRows(new LinkedHashSet<Long>());
     }
 
     @Override
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = {MSLTable.COLUMN_ID, MSLTable.COLUMN_ITEM};
-        CursorLoader cursorLoader = new CursorLoader(getActivity(),
+        return new CursorLoader(getActivity(),
                 MSLContentProvider.CONTENT_URI, projection, null, null, null);
-        return cursorLoader;
     }
 
     @Override
@@ -129,56 +147,4 @@ public class MSLRecyclerViewFragment extends Fragment
         mAdapter.changeCursor(null);
     }
 
-    public static class MSLTouchListener implements RecyclerView.OnItemTouchListener {
-
-        private ClickListener mClickListener;
-        private RecyclerView mRecyclerView; //TODO: for long press
-        private GestureDetector mGestureDetector;
-
-        public MSLTouchListener(Context context, final RecyclerView recyclerView, final ClickListener clickListener) {
-            mClickListener = clickListener;
-            mRecyclerView = recyclerView;
-            mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-                @Override
-                public boolean onSingleTapUp(MotionEvent e) {
-                    Log.d("test", "onSingleTapUp"  + e);
-                    return true;
-                }
-
-                @Override
-                public void onLongPress(MotionEvent e) {
-//                    View child = mRecyclerView.findChildViewUnder(e.getX(), e.getY());
-//                    if (child != null && mClickListener != null && mGestureDetector.onTouchEvent(e)) {
-//                        mClickListener.onLongClick(child, mRecyclerView.getChildAdapterPosition(child));
-//                    }
-                }
-            });
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-            View child = rv.findChildViewUnder(e.getX(), e.getY());
-            if (child != null && mClickListener != null && mGestureDetector.onTouchEvent(e)) {
-                Log.d("test", "onInterceptTouch " + mGestureDetector.onTouchEvent(e)+ " " + e);
-                mClickListener.onClick(child, rv.getChildAdapterPosition(child));
-            }
-            return false;
-        }
-
-        @Override
-        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-        }
-
-        @Override
-        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-        }
-    }
-
-    public interface ClickListener {
-        void onClick(View view, int position);
-
-        void onLongClick(View view, int position);
-    }
 }
