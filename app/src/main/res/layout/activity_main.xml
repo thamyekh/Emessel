@@ -10,48 +10,12 @@
         android:id="@+id/app_bar"
         layout="@layout/app_bar" />
 
-    <RelativeLayout
-        android:id="@+id/group"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/app_bar"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/txt_add_item"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:layout_centerVertical="true"
-            android:hint="@string/insert_item_long"
-            android:inputType="text" />
-
-        <ImageButton
-            android:id="@+id/btn_add_item"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:background="?android:attr/selectableItemBackground"
-            android:onClick="onClickAdd"
-            android:src="@drawable/ic_done_black_18dp" />
-
-        <View
-            android:layout_width="2dp"
-            android:layout_height="60dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_toLeftOf="@id/btn_add_item"
-            android:background="?android:attr/listDivider" />
-    </RelativeLayout>
-
     <fragment
         android:name="com.smurfee.android.emessel.recyclerview.MSLRecyclerViewFragment"
         android:id="@+id/fragment_recycler_msl"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/group"
+        android:layout_below="@+id/app_bar"
         android:layout_weight="1"
         tools:layout="@layout/fragment_mslrecycler_view" />
 

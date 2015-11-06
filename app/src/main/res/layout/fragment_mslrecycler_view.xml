@@ -4,9 +4,37 @@
     android:layout_height="match_parent"
     tools:context="com.smurfee.android.emessel.recyclerview.MSLRecyclerViewFragment">
 
+    <EditText
+        android:id="@+id/txt_add_item"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:hint="@string/insert_item_long"
+        android:inputType="text" />
+
+    <ImageButton
+        android:id="@+id/btn_add_item"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:background="?android:attr/selectableItemBackground"
+        android:src="@drawable/ic_done_black_18dp" />
+
+    <View
+        android:layout_width="2dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_toLeftOf="@id/btn_add_item"
+        android:layout_toStartOf="@id/btn_add_item"
+        android:background="?android:attr/listDivider" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_msl"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_add_item"/>
 
 </RelativeLayout>

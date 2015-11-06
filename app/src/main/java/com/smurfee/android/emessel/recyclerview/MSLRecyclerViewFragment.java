@@ -13,9 +13,11 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.smurfee.android.emessel.R;
 import com.smurfee.android.emessel.db.MSLContentProvider;
@@ -29,16 +31,16 @@ import java.util.Set;
  * A {@link Fragment} class used to hold a RecylerView to display Shopping List items.
  *
  * @author smurfee
- * @version 2015.11.1
+ * @version 2015.11.6
  */
 public class MSLRecyclerViewFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+        implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 
     private RecyclerView mRecyclerView;
     private MSLViewAdapter mAdapter;
+    private EditText txtItem;
 
     public MSLRecyclerViewFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -46,57 +48,39 @@ public class MSLRecyclerViewFragment extends Fragment
                              Bundle savedInstanceState) {
         View layout = inflater.inflate(R.layout.fragment_mslrecycler_view, container, false);
         mRecyclerView = (RecyclerView) layout.findViewById(R.id.recycler_msl);
-
+        txtItem = (EditText) layout.findViewById(R.id.txt_add_item);
+        txtItem.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    addItem();
+                    return true;
+                }
+                return false;
+            }
+        });
+        layout.findViewById(R.id.btn_add_item).setOnClickListener(this);
         mAdapter = new MSLViewAdapter(null);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addOnItemTouchListener(new TouchListener(getActivity(), mRecyclerView,
-                new TouchListener.ClickListener() {
-                    @Override
-                    public void onClick(View view, int position) {
-                        int expandPosition = mAdapter.getExpandedPosition();
-                        if (expandPosition >= 0 && expandPosition == position) {
-                            mAdapter.setExpandedPosition(-1);
-                            mAdapter.notifyItemChanged(position);
-                            return;
-                        }
-                        mAdapter.toggleChecked(position);
-                    }
+                TouchListener.newClickListener(mAdapter, mRecyclerView)));
 
-                    @Override
-                    public void onLongClick(View view, int position) {
-                        //http://stackoverflow.com/questions/27203817/recyclerview-expand-collapse-items
-                        int expandedPosition = mAdapter.getExpandedPosition();
-                        if (expandedPosition >= 0) {
-                            int prev = expandedPosition;
-                            mAdapter.notifyItemChanged(prev);
-                        }
-                        mAdapter.setExpandedPosition(position);
-                        mAdapter.notifyItemChanged(position);
-
-                        int[] xy = new int[2];
-                        view.getLocationInWindow(xy);
-                        float d = getActivity().getResources().getDisplayMetrics().density;
-                        int offset = (int) ((150 * d) + 0.5f);
-                        mRecyclerView.smoothScrollBy(0, (xy[1] - (offset)));
-                    }
-                }));
         getLoaderManager().initLoader(0, null, this);
-//        db.close();
         return layout;
     }
 
     /**
-     * Create a record and insert it into the database, the {@link CursorLoader} will update the view
-     * asynchronously.
-     *
-     * @param context
-     * @param item
+     * Take input text, create a record and insert it into the database. The {@link CursorLoader}
+     * will update the view on a background thread.
      */
-    public void addItemToDatabase(Context context, String item) {
+    public void addItem() {
+        String item = txtItem.getText().toString();
+        if (item.isEmpty()) return; // Don't add nothing
+
         ContentValues values = new ContentValues();
         values.put(MSLTable.COLUMN_ITEM, item);
-        context.getContentResolver().insert(MSLContentProvider.CONTENT_URI, values);
+        getActivity().getContentResolver().insert(MSLContentProvider.CONTENT_URI, values);
     }
 
     /**
@@ -147,4 +131,13 @@ public class MSLRecyclerViewFragment extends Fragment
         mAdapter.changeCursor(null);
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_add_item:
+                addItem();
+                txtItem.getText().clear();
+                break;
+        }
+    }
 }

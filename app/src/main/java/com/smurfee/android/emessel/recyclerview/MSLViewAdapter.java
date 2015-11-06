@@ -3,6 +3,7 @@ package com.smurfee.android.emessel.recyclerview;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,7 @@ import java.util.Set;
  * Derived from skyfishjy's CursorRecyclerViewAdapter.
  *
  * @author smurfee
- * @version 2015.10.12
+ * @version 2015.11.6
  */
 
 
@@ -39,7 +40,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     private Set<Long> mDeleteSet = new LinkedHashSet<>();
 
     public MSLViewAdapter(Cursor cursor) {
-//        populate(cursor);
+        mCursor = cursor;
         mRowIdColumn = mDataValid ? mCursor.getColumnIndex(MSLTable.COLUMN_ID) : -1;
         mDataSetObserver = new MSLDataSetObserver();
         if (mCursor != null) {
@@ -59,7 +60,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         MSLRowView current = mRows.get(position);
         holder.item.setText(current.getItem());
 
-        // Marks rows that have been previously clicked for deletion
+        // (Un)marks row for deletion
         boolean isChecked = mRows.get(position).isChecked();
         if (isChecked) holder.itemView.setSelected(true);
         else holder.itemView.setSelected(false);
@@ -209,6 +210,12 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         public ViewHolder(View itemView) {
             super(itemView);
             item = (TextView) itemView.findViewById(R.id.label);
+            item.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("test", "yay");
+                }
+            });
             icon = (ImageView) itemView.findViewById(R.id.icon);
             expandable = (LinearLayout) itemView.findViewById(R.id.expandable);
         }
