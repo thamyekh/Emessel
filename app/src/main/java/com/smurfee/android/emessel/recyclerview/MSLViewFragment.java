@@ -28,19 +28,19 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * A {@link Fragment} class used to hold a RecylerView to display Shopping List items.
+ * A {@link Fragment} class used to hold a RecyclerView to display Shopping List items.
  *
  * @author smurfee
- * @version 2015.11.6
+ * @version 2015.11.8
  */
-public class MSLRecyclerViewFragment extends Fragment
+public class MSLViewFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 
     private RecyclerView mRecyclerView;
     private MSLViewAdapter mAdapter;
     private EditText txtItem;
 
-    public MSLRecyclerViewFragment() {
+    public MSLViewFragment() {
     }
 
     @Override
@@ -60,11 +60,11 @@ public class MSLRecyclerViewFragment extends Fragment
             }
         });
         layout.findViewById(R.id.btn_add_item).setOnClickListener(this);
-        mAdapter = new MSLViewAdapter(null);
+        mAdapter = new MSLViewAdapter(getActivity(), null);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addOnItemTouchListener(new TouchListener(getActivity(), mRecyclerView,
-                TouchListener.newClickListener(mAdapter, mRecyclerView)));
+        mRecyclerView.addOnItemTouchListener(new MSLTouchListener(getActivity(), mRecyclerView,
+                MSLTouchListener.newClickListener(mAdapter, mRecyclerView)));
 
         getLoaderManager().initLoader(0, null, this);
         return layout;
@@ -90,7 +90,7 @@ public class MSLRecyclerViewFragment extends Fragment
      * @param context Parent Activity used to get a Content Resolver.
      */
     public void deleteItems(Context context) {
-        ArrayList<ContentProviderOperation> operations = new ArrayList<ContentProviderOperation>();
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
         ContentProviderOperation operation;
 
         Set<Long> deleteSet = mAdapter.getSelectedRows();

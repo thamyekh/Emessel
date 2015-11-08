@@ -11,7 +11,7 @@
         layout="@layout/app_bar" />
 
     <fragment
-        android:name="com.smurfee.android.emessel.recyclerview.MSLRecyclerViewFragment"
+        android:name="com.smurfee.android.emessel.recyclerview.MSLViewFragment"
         android:id="@+id/fragment_recycler_msl"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"

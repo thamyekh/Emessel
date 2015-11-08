@@ -4,7 +4,8 @@
     android:layout_height="wrap_content"
     android:animateLayoutChanges="true"
     android:background="@drawable/selector_row"
-    android:descendantFocusability="blocksDescendants">
+    >
+    <!--android:descendantFocusability="blocksDescendants"-->
 
     <ImageView
         android:id="@+id/icon"
@@ -41,11 +42,11 @@
             android:layout_margin="6dp"
             android:text="Item One" />
 
-        <TextView
+        <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="6dp"
-            android:text="Item Two" />
+            android:hint="Item Two"
+            android:inputType="text" />
 
     </LinearLayout>
 

@@ -7,7 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.smurfee.android.emessel.recyclerview.MSLRecyclerViewFragment;
+import com.smurfee.android.emessel.recyclerview.MSLViewFragment;
 
 /**
  * TODO(s):
@@ -22,7 +22,7 @@ import com.smurfee.android.emessel.recyclerview.MSLRecyclerViewFragment;
 
 public class MainActivity extends AppCompatActivity {
 
-    private MSLRecyclerViewFragment fragment;
+    private MSLViewFragment fragment;
 
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         FragmentManager fm = getSupportFragmentManager();
-        fragment = (MSLRecyclerViewFragment) fm.findFragmentById(R.id.fragment_recycler_msl);
+        fragment = (MSLViewFragment) fm.findFragmentById(R.id.fragment_recycler_msl);
     }
 
     @Override

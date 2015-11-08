@@ -10,17 +10,18 @@ import android.view.View;
  * Handles clicks and long presses for the MSLRecyclerView
  *
  * @author smurfee
- * @version 2015.11.6
+ * @version 2015.11.8
  */
-public class TouchListener implements RecyclerView.OnItemTouchListener {
+public class MSLTouchListener implements RecyclerView.OnItemTouchListener {
 
-    private static float mDensity;
+    private static Context mContext;
+    private boolean mDisallowIntercept;
     private ClickListener mClickListener;
 
     public interface ClickListener {
 
-        int OFFSET_A = (int) ((150 * mDensity) + 0.5f); //Long click above an expanded row
-        int OFFSET_B = (int) ((200 * mDensity) + 0.5f); //Long click below an expanded row
+        int OFFSET_A = (int) (150 * mContext.getResources().getDisplayMetrics().density + 0.5f);
+        int OFFSET_B = (int) (200 * mContext.getResources().getDisplayMetrics().density + 0.5f);
 
         void onClick(View view, int position);
 
@@ -29,17 +30,23 @@ public class TouchListener implements RecyclerView.OnItemTouchListener {
 
     private GestureDetector mGestureDetector;
 
-    public TouchListener(Context context, final RecyclerView recyclerView, ClickListener clickListener) {
-        mDensity = context.getResources().getDisplayMetrics().density;
+    public MSLTouchListener(Context context, final RecyclerView recyclerView, ClickListener clickListener) {
+        mContext = context;
         mClickListener = clickListener;
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
 
             @Override
-            public boolean onSingleTapUp(MotionEvent e){
+            public boolean onSingleTapUp(MotionEvent e) {
+                View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
+                if (child != null && mClickListener != null) {
+                    mClickListener.onClick(child, recyclerView.getChildAdapterPosition(child));
+                }
                 return true;
             }
+
             @Override
             public void onLongPress(MotionEvent e) {
+                if (mDisallowIntercept) return;
                 View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
                 if (child != null && mClickListener != null) {
                     mClickListener.onLongClick(child, recyclerView.getChildAdapterPosition(child));
@@ -50,9 +57,8 @@ public class TouchListener implements RecyclerView.OnItemTouchListener {
 
     @Override
     public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent e) {
-        View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
-        if (child != null && mClickListener != null && mGestureDetector.onTouchEvent(e)) {
-            mClickListener.onClick(child, recyclerView.getChildAdapterPosition(child));
+        if (!mDisallowIntercept) {
+            mGestureDetector.onTouchEvent(e);
         }
         return false;
     }
@@ -63,27 +69,28 @@ public class TouchListener implements RecyclerView.OnItemTouchListener {
 
     @Override
     public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        mDisallowIntercept = disallowIntercept;
     }
 
-    public static ClickListener newClickListener(final MSLViewAdapter mAdapter, final RecyclerView recyclerView) {
+    public static ClickListener newClickListener(final MSLViewAdapter adapter, final RecyclerView recyclerView) {
 
-        return new TouchListener.ClickListener() {
+        return new MSLTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                int expandPosition = mAdapter.getExpandedPosition();
+                int expandPosition = adapter.getExpandedPosition();
                 if (expandPosition >= 0 && expandPosition == position) {
-//                    mAdapter.setExpandedPosition(-1);
-//                    mAdapter.notifyItemChanged(position);
+                    adapter.setExpandedPosition(-1);
+                    adapter.notifyItemChanged(position);
                     return;
                 }
-                mAdapter.toggleChecked(position);
+                adapter.toggleChecked(position);
             }
 
             @Override
             public void onLongClick(View view, int position) {
-                int expandedPosition = mAdapter.getExpandedPosition();
-                if (expandedPosition >= 0) {
-                    mAdapter.notifyItemChanged(expandedPosition); // collapse prev pos
+                int expandedPosition = adapter.getExpandedPosition();
+                if (expandedPosition >= 0) { // collapse prev pos
+                    adapter.notifyItemChanged(expandedPosition);
                 }
 
                 int[] xy = new int[2];
@@ -91,8 +98,8 @@ public class TouchListener implements RecyclerView.OnItemTouchListener {
                 int offset = (expandedPosition >= 0 && position > expandedPosition) ? OFFSET_B : OFFSET_A;
                 recyclerView.smoothScrollBy(0, (xy[1] - (offset)));
 
-                mAdapter.setExpandedPosition(position);
-                mAdapter.notifyItemChanged(position);
+                adapter.setExpandedPosition(position);
+                adapter.notifyItemChanged(position);
             }
         };
     }

@@ -1,12 +1,18 @@
 package com.smurfee.android.emessel.recyclerview;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,12 +30,13 @@ import java.util.Set;
  * Derived from skyfishjy's CursorRecyclerViewAdapter.
  *
  * @author smurfee
- * @version 2015.11.6
+ * @version 2015.11.8
  */
 
 
 public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHolder> {
 
+    private static Context mContext;
     private Cursor mCursor;
     private DataSetObserver mDataSetObserver;
     private boolean mDataValid;
@@ -39,7 +46,8 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     private List<MSLRowView> mRows = new ArrayList<>();
     private Set<Long> mDeleteSet = new LinkedHashSet<>();
 
-    public MSLViewAdapter(Cursor cursor) {
+    public MSLViewAdapter(Context context, Cursor cursor) {
+        mContext = context;
         mCursor = cursor;
         mRowIdColumn = mDataValid ? mCursor.getColumnIndex(MSLTable.COLUMN_ID) : -1;
         mDataSetObserver = new MSLDataSetObserver();
@@ -210,14 +218,60 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         public ViewHolder(View itemView) {
             super(itemView);
             item = (TextView) itemView.findViewById(R.id.label);
-            item.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d("test", "yay");
-                }
-            });
+            item.setOnTouchListener(newOnTouchListener());
             icon = (ImageView) itemView.findViewById(R.id.icon);
             expandable = (LinearLayout) itemView.findViewById(R.id.expandable);
+        }
+
+        /**
+         * Factory method for creating a {@link android.view.View.OnTouchListener} to attach to
+         * ViewHolder members.
+         */
+        public static View.OnTouchListener newOnTouchListener() {
+            return new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    RecyclerView recyclerView = (RecyclerView) view.getParent().getParent();
+                    int pos = recyclerView.getChildAdapterPosition((View) view.getParent());
+                    int expos = ((MSLViewAdapter) recyclerView.getAdapter()).getExpandedPosition();
+                    if (pos != expos) return false;
+
+                    view.getParent().requestDisallowInterceptTouchEvent(true);
+
+                    AlertDialog.Builder builder = newAlertDialogBuilder(view);
+                    builder.show();
+
+                    return false;
+                }
+            };
+        }
+
+        private static AlertDialog.Builder newAlertDialogBuilder(final View view) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            builder.setTitle("Edit Value");
+
+            final EditText input = new EditText(mContext);
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
+
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    TextView textView = (TextView) view;
+                    if (input.getText().equals(""))
+                        dialog.cancel();
+                    textView.setText(input.getText().toString());
+                    view.getParent().requestDisallowInterceptTouchEvent(false);
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    view.getParent().requestDisallowInterceptTouchEvent(false);
+                    dialog.cancel();
+                }
+            });
+            return builder;
         }
     }
 }

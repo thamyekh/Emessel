@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.smurfee.android.emessel.recyclerview.MSLRecyclerViewFragment">
+    tools:context="com.smurfee.android.emessel.recyclerview.MSLViewFragment">
 
     <EditText
         android:id="@+id/txt_add_item"
