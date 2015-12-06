@@ -5,7 +5,6 @@
     android:animateLayoutChanges="true"
     android:background="@drawable/selector_row"
     >
-    <!--android:descendantFocusability="blocksDescendants"-->
 
     <ImageView
         android:id="@+id/icon"
@@ -27,27 +26,12 @@
         android:layout_toEndOf="@+id/icon"
         android:textSize="20sp" />
 
-    <LinearLayout
-        android:id="@+id/expandable"
-        android:visibility="gone"
+    <include
+        android:id="@+id/expanded"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:layout_below="@+id/icon">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="6dp"
-            android:text="Item One" />
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="Item Two"
-            android:inputType="text" />
-
-    </LinearLayout>
+        android:layout_below="@id/label"
+        android:visibility="gone"
+        layout="@layout/list_row_expanded" />
 
 </RelativeLayout>

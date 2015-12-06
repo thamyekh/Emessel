@@ -30,7 +30,7 @@ import java.util.Set;
  * Derived from skyfishjy's CursorRecyclerViewAdapter.
  *
  * @author smurfee
- * @version 2015.11.8
+ * @version 2015.12.6
  */
 
 
@@ -66,18 +66,19 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         MSLRowView current = mRows.get(position);
+
+        if (position == mExpandedPosition) {
+            holder.expand(current);
+        } else {
+            holder.collapse();
+        }
+
         holder.item.setText(current.getItem());
 
         // (Un)marks row for deletion
         boolean isChecked = mRows.get(position).isChecked();
         if (isChecked) holder.itemView.setSelected(true);
         else holder.itemView.setSelected(false);
-
-        if (position == mExpandedPosition) {
-            holder.expandable.setVisibility(View.VISIBLE);
-        } else {
-            holder.expandable.setVisibility(View.GONE);
-        }
     }
 
     @Override
@@ -210,68 +211,36 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         TextView item;
         ImageView icon;
-        LinearLayout expandable;
+        View expanded;
+        ImageView close;
 
         public ViewHolder(View itemView) {
             super(itemView);
             item = (TextView) itemView.findViewById(R.id.label);
-            item.setOnTouchListener(newOnTouchListener());
             icon = (ImageView) itemView.findViewById(R.id.icon);
-            expandable = (LinearLayout) itemView.findViewById(R.id.expandable);
+            expanded = itemView.findViewById(R.id.expanded);
+            expanded.setOnTouchListener(MSLTouchListener.newOnTouchListener());
+            close = (ImageView) expanded.findViewById(R.id.close);
+            close.setOnClickListener(MSLTouchListener.collapseListener());
         }
 
-        /**
-         * Factory method for creating a {@link android.view.View.OnTouchListener} to attach to
-         * ViewHolder members.
-         */
-        public static View.OnTouchListener newOnTouchListener() {
-            return new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    RecyclerView recyclerView = (RecyclerView) view.getParent().getParent();
-                    int pos = recyclerView.getChildAdapterPosition((View) view.getParent());
-                    int expos = ((MSLViewAdapter) recyclerView.getAdapter()).getExpandedPosition();
-                    if (pos != expos) return false;
-
-                    view.getParent().requestDisallowInterceptTouchEvent(true);
-
-                    AlertDialog.Builder builder = newAlertDialogBuilder(view);
-                    builder.show();
-
-                    return false;
-                }
-            };
+        public void expand(MSLRowView current) {
+            item.setVisibility(View.GONE);
+            icon.setVisibility(View.GONE);
+            expanded.setVisibility(View.VISIBLE);
+            EditText editItem = (EditText) expanded.findViewById(R.id.edit_item);
+            editItem.setText(current.getItem());
+            close.setVisibility(View.VISIBLE);
         }
 
-        private static AlertDialog.Builder newAlertDialogBuilder(final View view) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-            builder.setTitle("Edit Value");
-
-            final EditText input = new EditText(mContext);
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
-            builder.setView(input);
-
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    TextView textView = (TextView) view;
-                    if (input.getText().equals(""))
-                        dialog.cancel();
-                    textView.setText(input.getText().toString());
-                    view.getParent().requestDisallowInterceptTouchEvent(false);
-                }
-            });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    view.getParent().requestDisallowInterceptTouchEvent(false);
-                    dialog.cancel();
-                }
-            });
-            return builder;
+        public void collapse() {
+            item.setVisibility(View.VISIBLE);
+            icon.setVisibility(View.VISIBLE);
+            expanded.setVisibility(View.GONE);
+            close.setVisibility(View.GONE);
         }
     }
 }
