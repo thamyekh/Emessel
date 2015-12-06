@@ -79,12 +79,12 @@ public class MSLViewFragment extends Fragment
         if (item.isEmpty()) return; // Don't add nothing
 
         ContentValues values = new ContentValues();
-        values.put(MSLTable.COLUMN_ITEM, item);
+        values.put(MSLTable.COLUMN_LABEL, item);
         getActivity().getContentResolver().insert(MSLContentProvider.CONTENT_URI, values);
     }
 
     /**
-     * When the delete checked item icon in the toolbar is checked this method is called to removed
+     * When the delete checked label icon in the toolbar is checked this method is called to removed
      * the checked items.
      *
      * @param context Parent Activity used to get a Content Resolver.
@@ -115,7 +115,11 @@ public class MSLViewFragment extends Fragment
 
     @Override
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection = {MSLTable.COLUMN_ID, MSLTable.COLUMN_ITEM};
+        String[] projection = {
+                MSLTable.COLUMN_ID,
+                MSLTable.COLUMN_LABEL,
+                MSLTable.COLUMN_NOTE,
+                MSLTable.COLUMN_PRICE};
         return new CursorLoader(getActivity(),
                 MSLContentProvider.CONTENT_URI, projection, null, null, null);
     }

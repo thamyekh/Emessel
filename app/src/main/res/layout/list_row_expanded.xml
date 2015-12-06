@@ -5,12 +5,26 @@
     android:animateLayoutChanges="true">
 
     <EditText
-        android:id="@+id/edit_item"
+        android:id="@+id/edit_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Item Two"
         android:inputType="text" />
 
+    <EditText
+        android:id="@+id/edit_notes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Add a note or two..."
+        android:imeOptions="actionDone"
+        android:inputType="textMultiLine|textNoSuggestions"
+        android:minLines="10"
+        android:singleLine="false" />
+
+    <EditText
+        android:id="@+id/edit_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal" />
 
     <ImageView
         android:id="@+id/close"
@@ -22,7 +36,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
-        android:layout_below="@+id/edit_item"
+        android:layout_below="@+id/edit_label"
         android:visibility="gone"
         android:src="@drawable/ok"/>
 

@@ -26,7 +26,10 @@ public class MSLSQLiteHelper extends SQLiteOpenHelper {
         MSLTable.onUpgrade(db, oldVersion, newVersion);
     }
 
-    //TODO remove after implementing delete items
+    /**
+     * Use in the case of resetting a database.
+     * @param context
+     */
     public void delete(Context context){
         close();
         context.deleteDatabase(DATABASE_NAME);

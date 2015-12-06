@@ -3,11 +3,9 @@ package com.smurfee.android.emessel.recyclerview;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -128,7 +126,7 @@ public class MSLTouchListener implements RecyclerView.OnItemTouchListener {
                 MSLViewAdapter adapter = (MSLViewAdapter) recyclerView.getAdapter();
 
                 ContentValues cv = new ContentValues();
-                cv.put(MSLTable.COLUMN_ITEM, ((EditText) row.findViewById(R.id.edit_item)).getText().toString());
+                cv.put(MSLTable.COLUMN_LABEL, ((EditText) row.findViewById(R.id.edit_label)).getText().toString());
 
                 mContext.getContentResolver().update(
                         MSLContentProvider.CONTENT_URI,
@@ -151,38 +149,8 @@ public class MSLTouchListener implements RecyclerView.OnItemTouchListener {
     public static View.OnTouchListener newOnTouchListener() {
 
         return new View.OnTouchListener() {
-            GestureDetector gestureDetector = new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener() {
-
-                @Override
-                public boolean onSingleTapUp(MotionEvent e) {
-//                    View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
-//                    if (child != null && mClickListener != null) {
-//                        mClickListener.onClick(child, recyclerView.getChildAdapterPosition(child));
-//                    }
-                    return true;
-                }
-
-                @Override
-                public void onLongPress(MotionEvent e) {
-//                    if (mDisallowIntercept) return;
-//                    View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
-//                    if (child != null && mClickListener != null) {
-//                        mClickListener.onLongClick(child, recyclerView.getChildAdapterPosition(child));
-//                    }
-                }
-            });
-
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-//                RecyclerView recyclerView = (RecyclerView) view.getParent().getParent();
-//                int pos = recyclerView.getChildAdapterPosition((View) view.getParent());
-//                int expos = ((MSLViewAdapter) recyclerView.getAdapter()).getExpandedPosition();
-//                if (pos != expos) return false;
-                gestureDetector.onTouchEvent(motionEvent);
-
-//                    AlertDialog.Builder builder = newAlertDialogBuilder(view);
-//                    builder.show();
-
                 return false;
             }
         };

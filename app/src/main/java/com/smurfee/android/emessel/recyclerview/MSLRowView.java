@@ -1,25 +1,45 @@
 package com.smurfee.android.emessel.recyclerview;
 
+import java.math.BigDecimal;
+
 /**
  * Created by YekHong on 27/10/2015.
  */
 public class MSLRowView {
 
     private long mId;
-    private String mItem;
+    private String mLabel;
+    private String mNote;
+    private BigDecimal mPrice;
     private boolean mChecked;
 
-    public MSLRowView(long id, String item){
+    public MSLRowView(long id, String label) {
         mId = id;
-        mItem = item;
+        mLabel = label;
     }
 
     public long getId() {
         return mId;
     }
 
-    public String getItem() {
-        return mItem;
+    public String getLabel() {
+        return mLabel;
+    }
+
+    public String getNote() {
+        return mNote;
+    }
+
+    public void setNote(String note) {
+        mNote = note;
+    }
+
+    public BigDecimal getPrice() {
+        return mPrice;
+    }
+
+    public void setPrice(String price) {
+        mPrice = new BigDecimal(price);
     }
 
     public boolean isChecked() {

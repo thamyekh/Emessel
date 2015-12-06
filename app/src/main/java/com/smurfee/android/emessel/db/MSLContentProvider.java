@@ -5,7 +5,6 @@ package com.smurfee.android.emessel.db;
  */
 
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -31,12 +30,8 @@ public class MSLContentProvider extends ContentProvider {
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
             + "/" + BASE_PATH);
 
-    public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-            + "/" + BASE_PATH + "s";
-    public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-            + "/" + BASE_PATH;
-
     private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+
     static {
         sURIMatcher.addURI(AUTHORITY, BASE_PATH, MSL);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", MSL_ID);
@@ -166,8 +161,11 @@ public class MSLContentProvider extends ContentProvider {
     }
 
     private void checkColumns(String[] projection) {
-        String[] available = { MSLTable.COLUMN_ITEM,
-                MSLTable.COLUMN_ID };
+        String[] available = {
+                MSLTable.COLUMN_LABEL,
+                MSLTable.COLUMN_ID,
+                MSLTable.COLUMN_NOTE,
+                MSLTable.COLUMN_PRICE};
         if (projection != null) {
             HashSet<String> requestedColumns = new HashSet<String>(Arrays.asList(projection));
             HashSet<String> availableColumns = new HashSet<String>(Arrays.asList(available));

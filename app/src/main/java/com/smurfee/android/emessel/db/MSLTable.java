@@ -10,13 +10,17 @@ public class MSLTable {
 
     public static final String TABLE_MSL = "MSL";
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_ITEM = "item";
+    public static final String COLUMN_LABEL = "label";
+    public static final String COLUMN_NOTE = "note";
+    public static final String COLUMN_PRICE = "price";
 
     //create database
     private static final String DATABASE_CREATE = "CREATE TABLE "
-            + TABLE_MSL + "(" + COLUMN_ID
-            + " integer primary key autoincrement, " + COLUMN_ITEM
-            + " text not null);";
+            + TABLE_MSL + "("
+            + COLUMN_ID + " integer primary key autoincrement, "
+            + COLUMN_LABEL + " text not null,"
+            + COLUMN_NOTE + ", "
+            + COLUMN_PRICE + ");";
 
     public static void onCreate(SQLiteDatabase database){
         database.execSQL(DATABASE_CREATE);

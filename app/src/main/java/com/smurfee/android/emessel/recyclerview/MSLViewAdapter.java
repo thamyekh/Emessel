@@ -1,20 +1,14 @@
 package com.smurfee.android.emessel.recyclerview;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.DataSetObserver;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.smurfee.android.emessel.R;
@@ -73,7 +67,8 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             holder.collapse();
         }
 
-        holder.item.setText(current.getItem());
+        holder.label.setText(current.getLabel());
+        holder.displayOptionalDetails(current);
 
         // (Un)marks row for deletion
         boolean isChecked = mRows.get(position).isChecked();
@@ -113,8 +108,19 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             MSLRowView mslItem;
             while (!cursor.isAfterLast()) {
                 long id = cursor.getLong(cursor.getColumnIndex(MSLTable.COLUMN_ID));
-                String item = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_ITEM));
+                String item = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_LABEL));
                 mslItem = new MSLRowView(id, item);
+
+                //TODO may need to handle null for note and/or price
+                if(!cursor.isNull(cursor.getColumnIndex(MSLTable.COLUMN_NOTE))){
+                    String note = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_NOTE));
+                    mslItem.setNote(note);
+                }
+                if(!cursor.isNull(cursor.getColumnIndex(MSLTable.COLUMN_PRICE))){
+                    String price = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_PRICE));
+                    mslItem.setPrice(price);
+                }
+
                 mRows.add(mslItem);
                 cursor.moveToNext();
             }
@@ -168,14 +174,14 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             mDataValid = true;
             int count = mCursor.getCount();
             if (mCursor.moveToPosition(count - 1) && count == (mRows.size() + 1)) {
-                // Add item
-                String itemStr = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_ITEM));
+                // Add label
+                String itemStr = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_LABEL));
                 long itemId = cursor.getLong(cursor.getColumnIndex(MSLTable.COLUMN_ID));
                 MSLRowView item = new MSLRowView(itemId, itemStr);
                 mRows.add(0, item);
                 notifyItemInserted(0);
             } else {
-                // Deleted item(s)
+                // Deleted label(s)
                 populate(mCursor);
                 notifyDataSetChanged();
             }
@@ -212,35 +218,61 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView item;
+        TextView label;
         ImageView icon;
+        TextView note;
+        TextView price;
         View expanded;
         ImageView close;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            item = (TextView) itemView.findViewById(R.id.label);
             icon = (ImageView) itemView.findViewById(R.id.icon);
+            label = (TextView) itemView.findViewById(R.id.label);
+            note = (TextView) itemView.findViewById(R.id.note);
+            price = (TextView) itemView.findViewById(R.id.price);
+
             expanded = itemView.findViewById(R.id.expanded);
             expanded.setOnTouchListener(MSLTouchListener.newOnTouchListener());
+
             close = (ImageView) expanded.findViewById(R.id.close);
             close.setOnClickListener(MSLTouchListener.collapseListener());
         }
 
-        public void expand(MSLRowView current) {
-            item.setVisibility(View.GONE);
-            icon.setVisibility(View.GONE);
-            expanded.setVisibility(View.VISIBLE);
-            EditText editItem = (EditText) expanded.findViewById(R.id.edit_item);
-            editItem.setText(current.getItem());
-            close.setVisibility(View.VISIBLE);
-        }
 
         public void collapse() {
-            item.setVisibility(View.VISIBLE);
+            label.setVisibility(View.VISIBLE);
             icon.setVisibility(View.VISIBLE);
             expanded.setVisibility(View.GONE);
             close.setVisibility(View.GONE);
+        }
+
+        public void expand(MSLRowView current) {
+            icon.setVisibility(View.GONE);
+            label.setVisibility(View.GONE);
+            note.setVisibility(View.GONE);
+            price.setVisibility(View.GONE);
+
+            expanded.setVisibility(View.VISIBLE);
+            ((EditText) expanded.findViewById(R.id.edit_label)).setText(current.getLabel());
+            ((EditText) expanded.findViewById(R.id.edit_notes)).setText(current.getNote());
+            ((EditText) expanded.findViewById(R.id.edit_price)).setText(current.getPrice().toPlainString());
+            close.setVisibility(View.VISIBLE);
+        }
+
+        public void displayOptionalDetails(MSLRowView current) {
+            if(current.getNote().isEmpty())
+                note.setVisibility(View.INVISIBLE);
+            else {
+                note.setVisibility(View.VISIBLE);
+                note.setText(current.getNote());
+            }
+            if(current.getPrice().equals(null))
+                price.setVisibility(View.INVISIBLE);
+            else {
+                price.setVisibility(View.VISIBLE);
+                price.setText(current.getPrice().toPlainString());
+            }
         }
     }
 }
