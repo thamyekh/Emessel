@@ -106,8 +106,7 @@ public class MSLViewFragment extends Fragment
 
         try {
             context.getContentResolver().applyBatch(MSLContentProvider.AUTHORITY, operations);
-        } catch (RemoteException e) {
-        } catch (OperationApplicationException e) {
+        } catch (RemoteException | OperationApplicationException ignored) {
         }
 
         mAdapter.setSelectedRows(new LinkedHashSet<Long>());

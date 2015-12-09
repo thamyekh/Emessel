@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -65,10 +66,10 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             holder.expand(current);
         } else {
             holder.collapse();
+            holder.displayOptionalDetails(current);
         }
 
         holder.label.setText(current.getLabel());
-        holder.displayOptionalDetails(current);
 
         // (Un)marks row for deletion
         boolean isChecked = mRows.get(position).isChecked();
@@ -112,11 +113,11 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
                 mslItem = new MSLRowView(id, item);
 
                 //TODO may need to handle null for note and/or price
-                if(!cursor.isNull(cursor.getColumnIndex(MSLTable.COLUMN_NOTE))){
+                if (!cursor.isNull(cursor.getColumnIndex(MSLTable.COLUMN_NOTE))) {
                     String note = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_NOTE));
                     mslItem.setNote(note);
                 }
-                if(!cursor.isNull(cursor.getColumnIndex(MSLTable.COLUMN_PRICE))){
+                if (!cursor.isNull(cursor.getColumnIndex(MSLTable.COLUMN_PRICE))) {
                     String price = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_PRICE));
                     mslItem.setPrice(price);
                 }
@@ -151,7 +152,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     }
 
     /**
-     * Change the current cursor to a new one and close the old one.
+     * Change the current cursor to a new one and btnDone the old one.
      *
      * @param cursor Updated cursor
      */
@@ -223,7 +224,9 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         TextView note;
         TextView price;
         View expanded;
-        ImageView close;
+        Button btnFind;
+        Button btnDone;
+        Button btnCancel;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -235,8 +238,10 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             expanded = itemView.findViewById(R.id.expanded);
             expanded.setOnTouchListener(MSLTouchListener.newOnTouchListener());
 
-            close = (ImageView) expanded.findViewById(R.id.close);
-            close.setOnClickListener(MSLTouchListener.collapseListener());
+            btnFind = (Button) expanded.findViewById(R.id.find);
+            btnDone = (Button) expanded.findViewById(R.id.done);
+            btnDone.setOnClickListener(MSLTouchListener.doneClickListener(itemView));
+            btnCancel = (Button) expanded.findViewById(R.id.cancel);
         }
 
 
@@ -244,7 +249,6 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             label.setVisibility(View.VISIBLE);
             icon.setVisibility(View.VISIBLE);
             expanded.setVisibility(View.GONE);
-            close.setVisibility(View.GONE);
         }
 
         public void expand(MSLRowView current) {
@@ -255,23 +259,24 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
 
             expanded.setVisibility(View.VISIBLE);
             ((EditText) expanded.findViewById(R.id.edit_label)).setText(current.getLabel());
-            ((EditText) expanded.findViewById(R.id.edit_notes)).setText(current.getNote());
-            ((EditText) expanded.findViewById(R.id.edit_price)).setText(current.getPrice().toPlainString());
-            close.setVisibility(View.VISIBLE);
+            if (current.getNote() != null)
+                ((EditText) expanded.findViewById(R.id.edit_notes)).setText(current.getNote());
+            if (current.getPrice() != null)
+                ((EditText) expanded.findViewById(R.id.edit_price)).setText(current.getPrice().toPlainString());
         }
 
         public void displayOptionalDetails(MSLRowView current) {
-            if(current.getNote().isEmpty())
+            if (current.getNote() == null)
                 note.setVisibility(View.INVISIBLE);
             else {
                 note.setVisibility(View.VISIBLE);
                 note.setText(current.getNote());
             }
-            if(current.getPrice().equals(null))
+            if (current.getPrice() == null)
                 price.setVisibility(View.INVISIBLE);
             else {
                 price.setVisibility(View.VISIBLE);
-                price.setText(current.getPrice().toPlainString());
+                price.setText("$" + current.getPrice().toPlainString());
             }
         }
     }

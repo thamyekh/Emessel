@@ -39,6 +39,8 @@ public class MSLRowView {
     }
 
     public void setPrice(String price) {
+        // input validation
+        if (price.equals("")) return;
         mPrice = new BigDecimal(price);
     }
 
