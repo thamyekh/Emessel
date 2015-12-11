@@ -1,6 +1,5 @@
 package com.smurfee.android.emessel.recyclerview;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
@@ -11,11 +10,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.smurfee.android.emessel.R;
-import com.smurfee.android.emessel.db.MSLContentProvider;
-import com.smurfee.android.emessel.db.MSLTable;
 
 /**
  * Handles clicks and long presses for the MSLRecyclerView
@@ -26,7 +20,7 @@ import com.smurfee.android.emessel.db.MSLTable;
 public class MSLTouchListener implements RecyclerView.OnItemTouchListener {
 
     private static Context mContext;
-    private static RecyclerView mRecyclerView;
+//    private static RecyclerView mRecyclerView; TODO remove
     private boolean mDisallowIntercept;
     private ClickListener mClickListener;
 
@@ -42,17 +36,17 @@ public class MSLTouchListener implements RecyclerView.OnItemTouchListener {
 
     private GestureDetector mGestureDetector;
 
-    public MSLTouchListener(Context context, RecyclerView recyclerView, ClickListener clickListener) {
+    public MSLTouchListener(Context context, final RecyclerView recyclerView, ClickListener clickListener) {
         mContext = context;
-        mRecyclerView = recyclerView;
+//        mRecyclerView = recyclerView; TODO remove
         mClickListener = clickListener;
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
 
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
-                View child = mRecyclerView.findChildViewUnder(e.getX(), e.getY());
+                View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
                 if (child != null && mClickListener != null) {
-                    mClickListener.onClick(child, mRecyclerView.getChildAdapterPosition(child));
+                    mClickListener.onClick(child, recyclerView.getChildAdapterPosition(child));
                 }
                 return true;
             }
@@ -60,9 +54,9 @@ public class MSLTouchListener implements RecyclerView.OnItemTouchListener {
             @Override
             public void onLongPress(MotionEvent e) {
                 if (mDisallowIntercept) return;
-                View child = mRecyclerView.findChildViewUnder(e.getX(), e.getY());
+                View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
                 if (child != null && mClickListener != null) {
-                    mClickListener.onLongClick(child, mRecyclerView.getChildAdapterPosition(child));
+                    mClickListener.onLongClick(child, recyclerView.getChildAdapterPosition(child));
                 }
                 mDisallowIntercept = true;
             }
@@ -114,40 +108,6 @@ public class MSLTouchListener implements RecyclerView.OnItemTouchListener {
 
                 adapter.setExpandedPosition(position);
                 adapter.notifyItemChanged(position);
-            }
-        };
-    }
-
-
-    public static View.OnClickListener doneClickListener(final View itemView) {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                String label = ((EditText) itemView.findViewById(R.id.edit_label)).getText().toString();
-                if (label.equals("")) {
-                    Toast.makeText(mContext, "Label cannot be empty", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                String note = ((EditText) itemView.findViewById(R.id.edit_notes)).getText().toString();
-                String price = ((EditText) itemView.findViewById(R.id.edit_price)).getText().toString();
-
-                int position = mRecyclerView.getChildAdapterPosition(itemView);
-                MSLViewAdapter adapter = (MSLViewAdapter) mRecyclerView.getAdapter();
-                ContentValues cv = new ContentValues();
-                cv.put(MSLTable.COLUMN_LABEL, label);
-                cv.put(MSLTable.COLUMN_NOTE, note);
-                cv.put(MSLTable.COLUMN_PRICE, price);
-
-                mContext.getContentResolver().update(
-                        MSLContentProvider.CONTENT_URI,
-                        cv,
-                        MSLTable.COLUMN_ID + " = " + adapter.getItemId(position),
-                        null);
-
-                adapter.setExpandedPosition(-1);
-                adapter.notifyItemChanged(position);
-                mRecyclerView.requestDisallowInterceptTouchEvent(false);
             }
         };
     }

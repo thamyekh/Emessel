@@ -13,6 +13,7 @@ public class MSLTable {
     public static final String COLUMN_LABEL = "label";
     public static final String COLUMN_NOTE = "note";
     public static final String COLUMN_PRICE = "price";
+    public static final String COLUMN_PRIORITY = "priority"; //TODO implement
 
     //create database
     private static final String DATABASE_CREATE = "CREATE TABLE "

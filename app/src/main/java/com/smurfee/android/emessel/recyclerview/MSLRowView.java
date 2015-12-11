@@ -12,6 +12,7 @@ public class MSLRowView {
     private String mNote;
     private BigDecimal mPrice;
     private boolean mChecked;
+    private int priority; //TODO implement with database
 
     public MSLRowView(long id, String label) {
         mId = id;

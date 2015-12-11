@@ -1,6 +1,7 @@
 package com.smurfee.android.emessel.recyclerview;
 
 
+import android.app.Service;
 import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
@@ -17,8 +18,10 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.smurfee.android.emessel.MainActivity;
 import com.smurfee.android.emessel.R;
 import com.smurfee.android.emessel.db.MSLContentProvider;
 import com.smurfee.android.emessel.db.MSLTable;
@@ -54,9 +57,12 @@ public class MSLViewFragment extends Fragment
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     addItem();
-                    return true;
+                    txtItem.setText("");
+                    txtItem.requestFocus();
+                    InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Service.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(txtItem, 0);
                 }
-                return false;
+                return true;
             }
         });
         layout.findViewById(R.id.btn_add_item).setOnClickListener(this);
@@ -139,8 +145,15 @@ public class MSLViewFragment extends Fragment
         switch (v.getId()) {
             case R.id.btn_add_item:
                 addItem();
+                // close keyboard
+                ((MainActivity) getActivity()).hideKeyboard();
                 txtItem.getText().clear();
+                txtItem.clearFocus();
                 break;
         }
+    }
+
+    public void lockAddItem(boolean b) {
+        txtItem.setEnabled(b);
     }
 }

@@ -1,5 +1,7 @@
 package com.smurfee.android.emessel.recyclerview;
 
+import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
@@ -10,9 +12,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.smurfee.android.emessel.MainActivity;
 import com.smurfee.android.emessel.R;
+import com.smurfee.android.emessel.db.MSLContentProvider;
 import com.smurfee.android.emessel.db.MSLTable;
 
 import java.util.ArrayList;
@@ -31,12 +37,13 @@ import java.util.Set;
 
 public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHolder> {
 
-    private static Context mContext;
+    private Context mContext;
     private Cursor mCursor;
     private DataSetObserver mDataSetObserver;
     private boolean mDataValid;
     private int mRowIdColumn;
     private int mExpandedPosition = -1;
+    private MSLViewFragment mFragment;
 
     private List<MSLRowView> mRows = new ArrayList<>();
     private Set<Long> mDeleteSet = new LinkedHashSet<>();
@@ -49,6 +56,9 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         if (mCursor != null) {
             mCursor.registerDataSetObserver(mDataSetObserver);
         }
+
+        mFragment = (MSLViewFragment) ((MainActivity) mContext)
+                .getSupportFragmentManager().findFragmentById(R.id.fragment_recycler_msl);
     }
 
     @Override
@@ -73,8 +83,13 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
 
         // (Un)marks row for deletion
         boolean isChecked = mRows.get(position).isChecked();
-        if (isChecked) holder.itemView.setSelected(true);
-        else holder.itemView.setSelected(false);
+        if (isChecked) {
+            holder.itemView.setSelected(true);
+            holder.icon.setImageResource(R.drawable.ic_check_circle_black_48dp);
+        } else {
+            holder.itemView.setSelected(false);
+            holder.icon.setImageResource(R.drawable.ic_priority_light_blue_300_48dp);
+        }
     }
 
     @Override
@@ -87,10 +102,11 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
      */
     @Override
     public long getItemId(int position) {
-        if (mDataValid && mCursor != null && mCursor.moveToPosition(position)) {
-            return mCursor.getLong(mRowIdColumn);
-        }
-        return 0;
+//        if (mDataValid && mCursor != null && mCursor.moveToPosition(position)) {
+//            return mCursor.getLong(mRowIdColumn);
+//        }
+//        return 0;
+        return mRows.get(position).getId();
     }
 
     @Override
@@ -202,6 +218,10 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         mExpandedPosition = expandedPosition;
     }
 
+    public MSLViewAdapter getAdapter() {
+        return MSLViewAdapter.this;
+    }
+
     private class MSLDataSetObserver extends DataSetObserver {
         @Override
         public void onChanged() {
@@ -240,15 +260,52 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
 
             btnFind = (Button) expanded.findViewById(R.id.find);
             btnDone = (Button) expanded.findViewById(R.id.done);
-            btnDone.setOnClickListener(MSLTouchListener.doneClickListener(itemView));
+            btnDone.setOnClickListener(doneClickListener());
             btnCancel = (Button) expanded.findViewById(R.id.cancel);
+
         }
 
+        public View.OnClickListener doneClickListener() {
+            return new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    String label = ((EditText) itemView.findViewById(R.id.edit_label)).getText().toString();
+                    if (label.equals("")) {
+                        Toast.makeText(mContext, "Label cannot be empty", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    String note = ((EditText) itemView.findViewById(R.id.edit_notes)).getText().toString();
+                    String price = ((EditText) itemView.findViewById(R.id.edit_price)).getText().toString();
+
+                    int position = getAdapterPosition();
+                    MSLViewAdapter adapter = getAdapter();
+                    ContentValues cv = new ContentValues();
+                    cv.put(MSLTable.COLUMN_LABEL, label);
+                    cv.put(MSLTable.COLUMN_NOTE, note);
+                    cv.put(MSLTable.COLUMN_PRICE, price);
+
+                    mContext.getContentResolver().update(
+                            MSLContentProvider.CONTENT_URI,
+                            cv,
+                            MSLTable.COLUMN_ID + " = " + adapter.getItemId(position),
+                            null);
+
+                    adapter.setExpandedPosition(RecyclerView.NO_POSITION);
+                    adapter.notifyItemChanged(position);
+                    ((RecyclerView) ((Activity) mContext).findViewById(R.id.recycler_msl))
+                            .requestDisallowInterceptTouchEvent(false);
+
+                    ((MainActivity) mContext).hideKeyboard();
+                }
+            };
+        }
 
         public void collapse() {
             label.setVisibility(View.VISIBLE);
             icon.setVisibility(View.VISIBLE);
             expanded.setVisibility(View.GONE);
+            mFragment.lockAddItem(true);
         }
 
         public void expand(MSLRowView current) {
@@ -263,17 +320,22 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
                 ((EditText) expanded.findViewById(R.id.edit_notes)).setText(current.getNote());
             if (current.getPrice() != null)
                 ((EditText) expanded.findViewById(R.id.edit_price)).setText(current.getPrice().toPlainString());
+            mFragment.lockAddItem(false);
         }
 
         public void displayOptionalDetails(MSLRowView current) {
-            if (current.getNote() == null)
-                note.setVisibility(View.INVISIBLE);
-            else {
+            if (current.getNote() == null || current.getNote().equals("")) {
+                note.setVisibility(View.GONE);
+                ((RelativeLayout.LayoutParams) label.getLayoutParams())
+                        .addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
+            } else {
                 note.setVisibility(View.VISIBLE);
                 note.setText(current.getNote());
+                ((RelativeLayout.LayoutParams) label.getLayoutParams())
+                        .addRule(RelativeLayout.CENTER_VERTICAL, 0);
             }
             if (current.getPrice() == null)
-                price.setVisibility(View.INVISIBLE);
+                price.setVisibility(View.GONE);
             else {
                 price.setVisibility(View.VISIBLE);
                 price.setText("$" + current.getPrice().toPlainString());
