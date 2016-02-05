@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
@@ -23,6 +24,7 @@ import android.widget.EditText;
 
 import com.smurfee.android.emessel.MainActivity;
 import com.smurfee.android.emessel.R;
+import com.smurfee.android.emessel.databinding.FragmentMslViewBinding;
 import com.smurfee.android.emessel.db.MSLContentProvider;
 import com.smurfee.android.emessel.db.MSLTable;
 
@@ -49,9 +51,11 @@ public class MSLViewFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View layout = inflater.inflate(R.layout.fragment_mslrecycler_view, container, false);
-        mRecyclerView = (RecyclerView) layout.findViewById(R.id.recycler_msl);
-        txtItem = (EditText) layout.findViewById(R.id.txt_add_item);
+//        View layout = inflater.inflate(R.binding.fragment_msl_view, container, false);
+        FragmentMslViewBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_msl_view, container, false);
+
+        mRecyclerView = binding.recyclerMsl;
+        txtItem = binding.txtAddItem;
         txtItem.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
@@ -62,18 +66,18 @@ public class MSLViewFragment extends Fragment
                     InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Service.INPUT_METHOD_SERVICE);
                     imm.showSoftInput(txtItem, 0);
                 }
-                return true;
+                return false;
             }
         });
-        layout.findViewById(R.id.btn_add_item).setOnClickListener(this);
+        binding.btnAddItem.setOnClickListener(this);
         mAdapter = new MSLViewAdapter(getActivity(), null);
+        binding.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addOnItemTouchListener(new MSLTouchListener(getActivity(), mRecyclerView,
                 MSLTouchListener.newClickListener(mAdapter, mRecyclerView)));
-
         getLoaderManager().initLoader(0, null, this);
-        return layout;
+        return binding.getRoot();
     }
 
     /**

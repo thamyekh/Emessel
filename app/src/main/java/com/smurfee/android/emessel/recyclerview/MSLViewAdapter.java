@@ -45,6 +45,10 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     private int mExpandedPosition = -1;
     private MSLViewFragment mFragment;
 
+    private final int something = 1;
+
+    public int getSomething(){ return something;}
+
     private List<MSLRowView> mRows = new ArrayList<>();
     private Set<Long> mDeleteSet = new LinkedHashSet<>();
 
@@ -56,7 +60,6 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         if (mCursor != null) {
             mCursor.registerDataSetObserver(mDataSetObserver);
         }
-
         mFragment = (MSLViewFragment) ((MainActivity) mContext)
                 .getSupportFragmentManager().findFragmentById(R.id.fragment_recycler_msl);
     }

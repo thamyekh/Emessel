@@ -17,6 +17,6 @@
         android:layout_height="fill_parent"
         android:layout_below="@+id/app_bar"
         android:layout_weight="1"
-        tools:layout="@layout/fragment_mslrecycler_view" />
+        tools:layout="@layout/fragment_msl_view" />
 
 </RelativeLayout>
