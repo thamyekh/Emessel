@@ -19,6 +19,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
@@ -43,7 +44,7 @@ public class MSLViewFragment extends Fragment
 
     private RecyclerView mRecyclerView;
     private MSLViewAdapter mAdapter;
-    private EditText txtItem;
+    private EditText mTxtItem;
 
     public MSLViewFragment() {
     }
@@ -55,16 +56,23 @@ public class MSLViewFragment extends Fragment
         FragmentMslViewBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_msl_view, container, false);
 
         mRecyclerView = binding.recyclerMsl;
-        txtItem = binding.txtAddItem;
-        txtItem.setOnKeyListener(new View.OnKeyListener() {
+        mTxtItem = binding.txtAddItem;
+
+        TranslateAnimation animation = new TranslateAnimation(0, 0, 0, 100);
+        animation.setDuration(1000);
+        animation.setFillAfter(false);
+
+        binding.imgPointer.startAnimation(animation);
+
+        mTxtItem.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     addItem();
-                    txtItem.setText("");
-                    txtItem.requestFocus();
+                    mTxtItem.setText("");
+                    mTxtItem.requestFocus();
                     InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Service.INPUT_METHOD_SERVICE);
-                    imm.showSoftInput(txtItem, 0);
+                    imm.showSoftInput(mTxtItem, 0);
                 }
                 return false;
             }
@@ -85,7 +93,7 @@ public class MSLViewFragment extends Fragment
      * will update the view on a background thread.
      */
     public void addItem() {
-        String item = txtItem.getText().toString();
+        String item = mTxtItem.getText().toString();
         if (item.isEmpty()) return; // Don't add nothing
 
         ContentValues values = new ContentValues();
@@ -151,13 +159,13 @@ public class MSLViewFragment extends Fragment
                 addItem();
                 // close keyboard
                 ((MainActivity) getActivity()).hideKeyboard();
-                txtItem.getText().clear();
-                txtItem.clearFocus();
+                mTxtItem.getText().clear();
+                mTxtItem.clearFocus();
                 break;
         }
     }
 
     public void lockAddItem(boolean b) {
-        txtItem.setEnabled(b);
+        mTxtItem.setEnabled(b);
     }
 }

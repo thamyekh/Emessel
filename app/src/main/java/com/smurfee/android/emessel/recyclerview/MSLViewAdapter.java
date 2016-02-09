@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.databinding.ObservableInt;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,9 +46,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     private int mExpandedPosition = -1;
     private MSLViewFragment mFragment;
 
-    private final int something = 1;
-
-    public int getSomething(){ return something;}
+    public final ObservableInt something = new ObservableInt();
 
     private List<MSLRowView> mRows = new ArrayList<>();
     private Set<Long> mDeleteSet = new LinkedHashSet<>();
@@ -97,7 +96,8 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return mRows.size();
+        something.set(mRows.size());
+        return something.get();
     }
 
     /**
