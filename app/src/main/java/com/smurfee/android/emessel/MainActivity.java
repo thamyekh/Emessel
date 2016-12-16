@@ -3,11 +3,14 @@ package com.smurfee.android.emessel;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.smurfee.android.emessel.recyclerview.MSLViewFragment;
 
@@ -26,6 +29,8 @@ import com.smurfee.android.emessel.recyclerview.MSLViewFragment;
 public class MainActivity extends AppCompatActivity {
 
     private MSLViewFragment fragment;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
 
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -34,6 +39,13 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         FragmentManager fm = getSupportFragmentManager();
         fragment = (MSLViewFragment) fm.findFragmentById(R.id.fragment_recycler_msl);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
+        String[] temp = {"hello", "test"}; //TODO move to xml
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, temp));
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
     }
 
     @Override

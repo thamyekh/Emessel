@@ -53,8 +53,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/layout_add_item"
-            android:src="@drawable/pointer"
-            android:visibility="@{adapter.something > 0 ? View.GONE : View.VISIBLE}" />
+            android:src="@drawable/ic_arrow"
+            android:visibility="@{adapter.something == 0 ? View.VISIBLE : View.GONE}" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_msl"

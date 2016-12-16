@@ -19,9 +19,10 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.smurfee.android.emessel.MainActivity;
 import com.smurfee.android.emessel.R;
@@ -45,6 +46,7 @@ public class MSLViewFragment extends Fragment
     private RecyclerView mRecyclerView;
     private MSLViewAdapter mAdapter;
     private EditText mTxtItem;
+    private ImageView mEmptyView;
 
     public MSLViewFragment() {
     }
@@ -57,12 +59,7 @@ public class MSLViewFragment extends Fragment
 
         mRecyclerView = binding.recyclerMsl;
         mTxtItem = binding.txtAddItem;
-
-        TranslateAnimation animation = new TranslateAnimation(0, 0, 0, 100);
-        animation.setDuration(1000);
-        animation.setFillAfter(false);
-
-        binding.imgPointer.startAnimation(animation);
+        mEmptyView = binding.imgPointer;
 
         mTxtItem.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -82,9 +79,11 @@ public class MSLViewFragment extends Fragment
         binding.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
+
         mRecyclerView.addOnItemTouchListener(new MSLTouchListener(getActivity(), mRecyclerView,
                 MSLTouchListener.newClickListener(mAdapter, mRecyclerView)));
         getLoaderManager().initLoader(0, null, this);
+
         return binding.getRoot();
     }
 
@@ -145,6 +144,9 @@ public class MSLViewFragment extends Fragment
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor cursor) {
         mAdapter.changeCursor(cursor);
         mRecyclerView.getLayoutManager().scrollToPosition(0);
+
+        mEmptyView.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.insert_first_item));
+        if (mAdapter.getItemCount() != 0) mEmptyView.clearAnimation();
     }
 
     @Override
