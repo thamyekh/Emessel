@@ -20,7 +20,6 @@ import android.widget.TextView;
 public class MSLTouchListener implements RecyclerView.OnItemTouchListener {
 
     private static Context mContext;
-//    private static RecyclerView mRecyclerView; TODO remove
     private boolean mDisallowIntercept;
     private ClickListener mClickListener;
 
@@ -30,7 +29,6 @@ public class MSLTouchListener implements RecyclerView.OnItemTouchListener {
         int OFFSET_B = (int) (200 * mContext.getResources().getDisplayMetrics().density + 0.5f);
 
         void onClick(View view, int position);
-
         void onLongClick(View view, int position);
     }
 
@@ -38,7 +36,6 @@ public class MSLTouchListener implements RecyclerView.OnItemTouchListener {
 
     public MSLTouchListener(Context context, final RecyclerView recyclerView, ClickListener clickListener) {
         mContext = context;
-//        mRecyclerView = recyclerView; TODO remove
         mClickListener = clickListener;
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
 

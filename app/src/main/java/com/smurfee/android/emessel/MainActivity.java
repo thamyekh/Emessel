@@ -2,15 +2,18 @@ package com.smurfee.android.emessel;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.smurfee.android.emessel.recyclerview.MSLViewFragment;
 
@@ -30,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     private MSLViewFragment fragment;
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -41,11 +44,37 @@ public class MainActivity extends AppCompatActivity {
         fragment = (MSLViewFragment) fm.findFragmentById(R.id.fragment_recycler_msl);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-        String[] temp = {"hello", "test"}; //TODO move to xml
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, temp));
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
+        mDrawerToggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
+
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.nav_new:
+                        Toast.makeText(MainActivity.this, "New clicked", Toast.LENGTH_SHORT).show();
+                        mDrawerLayout.closeDrawers();
+                        return true;
+                    case R.id.nav_open:
+                        Toast.makeText(MainActivity.this, "Open clicked", Toast.LENGTH_SHORT).show();
+                        mDrawerLayout.closeDrawers();
+                        return true;
+                    case R.id.nav_delete:
+                        Toast.makeText(MainActivity.this, "Delete clicked", Toast.LENGTH_SHORT).show();
+                        mDrawerLayout.closeDrawers();
+                        return true;
+                    case R.id.nav_settings:
+                        Toast.makeText(MainActivity.this, "Settings clicked", Toast.LENGTH_SHORT).show();
+                        mDrawerLayout.closeDrawers();
+                        return true;
+                }
+                mDrawerLayout.closeDrawers();
+                return true;
+            }
+        });
     }
 
     @Override

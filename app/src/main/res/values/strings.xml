@@ -9,6 +9,8 @@
     <string name="undo_action">Undo</string>
     <string name="ok">Sure</string>
     <string name="title_activity_msldetail">MSLDetailActivity</string>
+    <string name="drawer_open">Opens the navigation drawer.</string>
+    <string name="drawer_close">Closes the navigation drawer.</string>
 
     <string name="hello_world">Hello world!</string>
 

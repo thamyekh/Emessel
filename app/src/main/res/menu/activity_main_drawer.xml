@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_new"
+            android:title="New List" />
+        <item
+            android:id="@+id/nav_open"
+            android:title="Open" />
+        <item
+            android:id="@+id/nav_delete"
+            android:title="Delete" />
+        <item
+            android:id="@+id/nav_settings"
+            android:title="Settings" />
+    </group>
+
+    <item android:title="Miscellaneous">
+        <menu>
+            <item
+                android:id="@+id/nav_game"
+                android:title="IWANNAPLAYAGAME" />
+            <item
+                android:id="@+id/nav_about"
+                android:title="About" />
+        </menu>
+    </item>
+
+</menu>

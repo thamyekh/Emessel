@@ -6,7 +6,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.databinding.ObservableInt;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,12 @@ import com.smurfee.android.emessel.R;
 import com.smurfee.android.emessel.db.MSLContentProvider;
 import com.smurfee.android.emessel.db.MSLTable;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -262,10 +270,20 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             expanded.setOnTouchListener(MSLTouchListener.newOnTouchListener());
 
             btnFind = (Button) expanded.findViewById(R.id.find);
+            btnFind.setOnClickListener(findClickListener());
             btnDone = (Button) expanded.findViewById(R.id.done);
             btnDone.setOnClickListener(doneClickListener());
             btnCancel = (Button) expanded.findViewById(R.id.cancel);
 
+        }
+
+        private View.OnClickListener findClickListener() {
+            return new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new PriceFinder().execute();
+                }
+            };
         }
 
         public View.OnClickListener doneClickListener() {
@@ -343,6 +361,43 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
                 price.setVisibility(View.VISIBLE);
                 price.setText("$" + current.getPrice().toPlainString());
             }
+        }
+    }
+
+    private class PriceFinder extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                Log.d("JSoup", "attempting to connect");
+                Document doc = Jsoup.connect("https://shop.countdown.co.nz/").get();
+                Elements links = doc.select("a[href]");
+                Elements media = doc.select("[src]");
+                Elements imports = doc.select("link[href]");
+
+                for (Element src : media) {
+                    if (src.tagName().equals("img"))
+                        print(" * %s: <%s> %sx%s (%s)",
+                                src.tagName(), src.attr("abs:src"), src.attr("width"), src.attr("height"),
+                                trim(src.attr("alt"), 20));
+                    else
+                        print(" * %s: <%s>", src.tagName(), src.attr("abs:src"));
+                }
+            } catch (IOException e) {
+                Log.d("JSoup", e.toString());
+            }
+            return null;
+        }
+
+        private String trim(String s, int width) {
+            if (s.length() > width)
+                return s.substring(0, width-1) + ".";
+            else
+                return s;
+        }
+
+        private void print(String msg, Object... args) {
+            Log.d("JSoup",String.format(msg, args));
         }
     }
 }
