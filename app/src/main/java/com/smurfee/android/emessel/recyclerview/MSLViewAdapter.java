@@ -369,19 +369,17 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         @Override
         protected Void doInBackground(Void... voids) {
             try {
+                String keyword = "grapes"; //TODO replace with textview value
                 Log.d("JSoup", "attempting to connect");
-                Document doc = Jsoup.connect("https://shop.countdown.co.nz/").get();
-                Elements links = doc.select("a[href]");
-                Elements media = doc.select("[src]");
-                Elements imports = doc.select("link[href]");
+                Document doc = Jsoup.connect("https://shop.countdown.co.nz/Shop/SearchProducts?search=" + keyword).get();
+                Elements product = doc.select("#product-list .details-container.row-fluid.mrow-fluid");
 
-                for (Element src : media) {
-                    if (src.tagName().equals("img"))
-                        print(" * %s: <%s> %sx%s (%s)",
-                                src.tagName(), src.attr("abs:src"), src.attr("width"), src.attr("height"),
-                                trim(src.attr("alt"), 20));
-                    else
-                        print(" * %s: <%s>", src.tagName(), src.attr("abs:src"));
+                print("\nItem Name: (%d)", product.size());
+                for (Element cls : product) {
+                    String productName = trim(cls.select(".description.span12.mspan8").text(), 35);
+                    //TODO: must consider club price and non club price
+                    String productPrice = cls.select(".din-medium").first().text().split(" ", 2)[0];
+                    print(" * %s. @ %s", productName, productPrice);
                 }
             } catch (IOException e) {
                 Log.d("JSoup", e.toString());
@@ -391,13 +389,13 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
 
         private String trim(String s, int width) {
             if (s.length() > width)
-                return s.substring(0, width-1) + ".";
+                return s.substring(0, width - 1) + ".";
             else
-                return s;
+                return s + ".";
         }
 
         private void print(String msg, Object... args) {
-            Log.d("JSoup",String.format(msg, args));
+            Log.d("JSoup", String.format(msg, args));
         }
     }
 }
