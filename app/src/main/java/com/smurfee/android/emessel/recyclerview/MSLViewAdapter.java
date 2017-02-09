@@ -7,14 +7,17 @@ import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.databinding.ObservableInt;
 import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,7 +57,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     private int mExpandedPosition = -1;
     private MSLViewFragment mFragment;
 
-    public final ObservableInt something = new ObservableInt();
+    public final ObservableInt observableInt = new ObservableInt();
 
     private List<MSLRowView> mRows = new ArrayList<>();
     private Set<Long> mDeleteSet = new LinkedHashSet<>();
@@ -69,6 +72,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         }
         mFragment = (MSLViewFragment) ((MainActivity) mContext)
                 .getSupportFragmentManager().findFragmentById(R.id.fragment_recycler_msl);
+
     }
 
     @Override
@@ -104,8 +108,8 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        something.set(mRows.size());
-        return something.get();
+        observableInt.set(mRows.size());
+        return observableInt.get();
     }
 
     /**
@@ -281,7 +285,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             return new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    new PriceFinder().execute();
+                    new PriceFinder().execute(label.getText().toString());
                 }
             };
         }
@@ -364,27 +368,47 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         }
     }
 
-    private class PriceFinder extends AsyncTask<Void, Void, Void> {
+    private class PriceFinder extends AsyncTask<String, Void, String[]> {
+
+        private ListView popup;
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected String[] doInBackground(String... keyword) {
             try {
-                String keyword = "grapes"; //TODO replace with textview value
-                Log.d("JSoup", "attempting to connect");
-                Document doc = Jsoup.connect("https://shop.countdown.co.nz/Shop/SearchProducts?search=" + keyword).get();
+                Log.d("JSoup", "attempting to find " + keyword[0]);
+                Document doc = Jsoup.connect("https://shop.countdown.co.nz/Shop/SearchProducts?search=" + keyword[0]).get();
                 Elements product = doc.select("#product-list .details-container.row-fluid.mrow-fluid");
 
                 print("\nItem Name: (%d)", product.size());
+                List<String> printout = new ArrayList<>();
                 for (Element cls : product) {
                     String productName = trim(cls.select(".description.span12.mspan8").text(), 35);
                     //TODO: must consider club price and non club price
                     String productPrice = cls.select(".din-medium").first().text().split(" ", 2)[0];
-                    print(" * %s. @ %s", productName, productPrice);
+                    printout.add(String.format(" * %s. @ %s", productName, productPrice));
                 }
+                String[] priceResult = printout.toArray(new String[printout.size()]);
+
+                return priceResult;
             } catch (IOException e) {
                 Log.d("JSoup", e.toString());
             }
             return null;
+        }
+
+        protected void onPostExecute(String[] result) {
+            if(result == null) return;
+
+            popup = new ListView(mContext);
+            ArrayAdapter<String> popupAdapter = new ArrayAdapter<>(mContext, R.layout.list_price, R.id.item_and_price, result);
+            popup.setAdapter(popupAdapter);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            builder.setCancelable(true);
+            if (popup.getParent() != null)
+                ((ViewGroup) popup.getParent()).removeView(popup);
+            builder.setView(popup);
+            builder.create().show();
         }
 
         private String trim(String s, int width) {

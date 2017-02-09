@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/layout_add_item"
             android:src="@drawable/ic_arrow"
-            android:visibility="@{adapter.something == 0 ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{adapter.observableInt == 0 ? View.VISIBLE : View.GONE}" />
 
         <TextView
             android:layout_width="match_parent"
@@ -64,7 +64,7 @@
             android:gravity="center"
             android:text="add something"
             android:textSize="10dp"
-            android:visibility="@{adapter.something == 0 ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{adapter.observableInt == 0 ? View.VISIBLE : View.GONE}" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_msl"
