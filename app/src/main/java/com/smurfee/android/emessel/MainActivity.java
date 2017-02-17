@@ -55,19 +55,27 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.nav_new:
-                        Toast.makeText(MainActivity.this, "New clicked", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "not implemented yet...", Toast.LENGTH_SHORT).show();
+                        mDrawerLayout.closeDrawers();
+                        return true;
+                    case R.id.nav_save:
+                        Toast.makeText(MainActivity.this, "not implemented yet...", Toast.LENGTH_SHORT).show();
                         mDrawerLayout.closeDrawers();
                         return true;
                     case R.id.nav_open:
-                        Toast.makeText(MainActivity.this, "Open clicked", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "not implemented yet...", Toast.LENGTH_SHORT).show();
                         mDrawerLayout.closeDrawers();
                         return true;
                     case R.id.nav_delete:
-                        Toast.makeText(MainActivity.this, "Delete clicked", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "not implemented yet...", Toast.LENGTH_SHORT).show();
+                        mDrawerLayout.closeDrawers();
+                        return true;
+                    case R.id.nav_sms:
+                        Toast.makeText(MainActivity.this, "not implemented yet...", Toast.LENGTH_SHORT).show();
                         mDrawerLayout.closeDrawers();
                         return true;
                     case R.id.nav_settings:
-                        Toast.makeText(MainActivity.this, "Settings clicked", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "not implemented yet...", Toast.LENGTH_SHORT).show();
                         mDrawerLayout.closeDrawers();
                         return true;
                 }

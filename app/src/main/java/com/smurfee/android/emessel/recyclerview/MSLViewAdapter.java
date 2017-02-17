@@ -9,10 +9,12 @@ import android.databinding.ObservableInt;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -285,7 +287,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             return new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    new PriceFinder().execute(label.getText().toString());
+                    new PriceFinder(itemView).execute(((EditText) expanded.findViewById(R.id.edit_label)).getText().toString());
                 }
             };
         }
@@ -370,45 +372,59 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
 
     private class PriceFinder extends AsyncTask<String, Void, String[]> {
 
-        private ListView popup;
+        private ListView popupDialog;
+        private TextView updatePrice;
+        private AlertDialog popup;
+
+        public PriceFinder(View updatePrice) {
+            this.updatePrice = (TextView) updatePrice.findViewById(R.id.edit_price);
+        }
 
         @Override
         protected String[] doInBackground(String... keyword) {
             try {
-                Log.d("JSoup", "attempting to find " + keyword[0]);
                 Document doc = Jsoup.connect("https://shop.countdown.co.nz/Shop/SearchProducts?search=" + keyword[0]).get();
                 Elements product = doc.select("#product-list .details-container.row-fluid.mrow-fluid");
 
                 print("\nItem Name: (%d)", product.size());
                 List<String> printout = new ArrayList<>();
-                for (Element cls : product) {
+                for (Element cls : product) {  //TODO: Include club price, non-club price and volume
                     String productName = trim(cls.select(".description.span12.mspan8").text(), 35);
-                    //TODO: must consider club price and non club price
                     String productPrice = cls.select(".din-medium").first().text().split(" ", 2)[0];
-                    printout.add(String.format(" * %s. @ %s", productName, productPrice));
+                    printout.add(String.format(" * %s. \n %s", productName, productPrice));
                 }
                 String[] priceResult = printout.toArray(new String[printout.size()]);
 
                 return priceResult;
             } catch (IOException e) {
-                Log.d("JSoup", e.toString());
             }
             return null;
         }
 
-        protected void onPostExecute(String[] result) {
-            if(result == null) return;
+        protected void onPostExecute(final String[] result) {
+            if (result == null) return;
 
-            popup = new ListView(mContext);
-            ArrayAdapter<String> popupAdapter = new ArrayAdapter<>(mContext, R.layout.list_price, R.id.item_and_price, result);
-            popup.setAdapter(popupAdapter);
+            popupDialog = new ListView(mContext);
+            ArrayAdapter<String> popupAdapter = new ArrayAdapter<>(mContext, R.layout.list_price, R.id.result_item, result);
+            popupDialog.setAdapter(popupAdapter);
+            popupDialog.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
+                    String resultRow = ((TextView) view.findViewById(R.id.result_item)).getText().toString();
+                    String[] tokens = TextUtils.split(resultRow, "\\$");
+                    if (tokens.length == 0) return; // return if there is no price
+                    updatePrice.setText(tokens[tokens.length - 1]);
+                    popup.cancel();
+                }
+            });
 
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
             builder.setCancelable(true);
-            if (popup.getParent() != null)
-                ((ViewGroup) popup.getParent()).removeView(popup);
-            builder.setView(popup);
-            builder.create().show();
+            if (popupDialog.getParent() != null)
+                ((ViewGroup) popupDialog.getParent()).removeView(popupDialog);
+            builder.setView(popupDialog);
+            popup = builder.create();
+            popup.show();
         }
 
         private String trim(String s, int width) {

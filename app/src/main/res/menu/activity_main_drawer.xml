@@ -6,24 +6,27 @@
             android:id="@+id/nav_new"
             android:title="New List" />
         <item
+            android:id="@+id/nav_save"
+            android:title="Save" />
+        <item
             android:id="@+id/nav_open"
             android:title="Open" />
         <item
             android:id="@+id/nav_delete"
             android:title="Delete" />
         <item
+            android:id="@+id/nav_sms"
+            android:title="SMS List" />
+        <item
             android:id="@+id/nav_settings"
             android:title="Settings" />
     </group>
 
-    <item android:title="Miscellaneous">
+    <item android:title="Other Stuff">
         <menu>
             <item
                 android:id="@+id/nav_game"
-                android:title="IWANNAPLAYAGAME" />
-            <item
-                android:id="@+id/nav_about"
-                android:title="About" />
+                android:title="play a game" />
         </menu>
     </item>
 
