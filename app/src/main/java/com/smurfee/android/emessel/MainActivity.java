@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.smurfee.android.emessel.db.MSLSQLiteHelper;
 import com.smurfee.android.emessel.recyclerview.MSLViewFragment;
 
 /**
@@ -55,8 +56,10 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.nav_new:
-                        Toast.makeText(MainActivity.this, "not implemented yet...", Toast.LENGTH_SHORT).show();
+                        deleteDatabase(MSLSQLiteHelper.DATABASE_NAME);
+                        fragment.deleteList(MainActivity.this);
                         mDrawerLayout.closeDrawers();
+                        Toast.makeText(MainActivity.this, "hope you didn't regret doing that", Toast.LENGTH_SHORT).show();
                         return true;
                     case R.id.nav_save:
                         Toast.makeText(MainActivity.this, "not implemented yet...", Toast.LENGTH_SHORT).show();

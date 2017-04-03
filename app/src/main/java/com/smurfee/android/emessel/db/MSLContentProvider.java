@@ -1,7 +1,10 @@
 package com.smurfee.android.emessel.db;
 
 /**
- * Created by smurfee on 23/09/2015.
+ * Created by smurfee on 23/09/2017.
+ *
+ * @author smurfee
+ * @version 2017.4.3
  */
 
 import android.content.ContentProvider;
@@ -97,6 +100,7 @@ public class MSLContentProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int uriType = sURIMatcher.match(uri);
+        database.close();
         SQLiteDatabase sqlDB = database.getWritableDatabase();
         int rowsDeleted = 0;
         switch (uriType) {

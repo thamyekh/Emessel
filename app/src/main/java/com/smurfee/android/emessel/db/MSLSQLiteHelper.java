@@ -6,11 +6,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * Created by smurfee on 20/09/2015.
+ *
+ * @author smurfee
+ * @version 2017.4.3
  */
 public class MSLSQLiteHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "msl.db";
-    private static final int DATABASE_VERSION = 1;
+    public static final String DATABASE_NAME = "msl.db";
+    public static final int DATABASE_VERSION = 1;
 
     public MSLSQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

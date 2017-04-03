@@ -28,6 +28,7 @@ import com.smurfee.android.emessel.MainActivity;
 import com.smurfee.android.emessel.R;
 import com.smurfee.android.emessel.databinding.FragmentMslViewBinding;
 import com.smurfee.android.emessel.db.MSLContentProvider;
+import com.smurfee.android.emessel.db.MSLSQLiteHelper;
 import com.smurfee.android.emessel.db.MSLTable;
 
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ import java.util.Set;
  * A {@link Fragment} class used to hold a RecyclerView to display Shopping List items.
  *
  * @author smurfee
- * @version 2015.11.8
+ * @version 2017.4.3
  */
 public class MSLViewFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
@@ -48,13 +49,9 @@ public class MSLViewFragment extends Fragment
     private EditText mTxtItem;
     private ImageView mEmptyView;
 
-    public MSLViewFragment() {
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-//        View layout = inflater.inflate(R.binding.fragment_msl_view, container, false);
         FragmentMslViewBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_msl_view, container, false);
 
         mRecyclerView = binding.recyclerMsl;
@@ -127,6 +124,10 @@ public class MSLViewFragment extends Fragment
         }
 
         mAdapter.setSelectedRows(new LinkedHashSet<Long>());
+    }
+
+    public void deleteList(Context context) {
+        context.getContentResolver().delete(MSLContentProvider.CONTENT_URI, null, null);
     }
 
     @Override
