@@ -29,6 +29,8 @@
                 android:layout_height="60dp"
                 android:layout_weight="1"
                 android:hint="@string/insert_item_long"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:inputType="text|textCapSentences" />
 
             <View

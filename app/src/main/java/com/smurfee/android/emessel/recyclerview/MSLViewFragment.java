@@ -64,9 +64,12 @@ public class MSLViewFragment extends Fragment
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     addItem();
                     mTxtItem.setText("");
-                    mTxtItem.requestFocus();
-                    InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Service.INPUT_METHOD_SERVICE);
-                    imm.showSoftInput(mTxtItem, 0);
+                    v.post(new Runnable(){
+                        @Override
+                        public void run(){
+                            mTxtItem.requestFocus();
+                        }
+                    });
                 }
                 return false;
             }
