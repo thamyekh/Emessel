@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "hope you didn't regret doing that", Toast.LENGTH_SHORT).show();
                         return true;
                     case R.id.nav_save:
+                        fragment.saveList(MainActivity.this);
                         Toast.makeText(MainActivity.this, "not implemented yet...", Toast.LENGTH_SHORT).show();
                         mDrawerLayout.closeDrawers();
                         return true;
