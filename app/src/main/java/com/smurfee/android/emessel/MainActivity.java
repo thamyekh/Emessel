@@ -63,10 +63,11 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     case R.id.nav_save:
                         fragment.saveList(MainActivity.this);
-                        Toast.makeText(MainActivity.this, "not implemented yet...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Save Successful.", Toast.LENGTH_SHORT).show();
                         mDrawerLayout.closeDrawers();
                         return true;
                     case R.id.nav_open:
+                        fragment.loadList(MainActivity.this);
                         Toast.makeText(MainActivity.this, "not implemented yet...", Toast.LENGTH_SHORT).show();
                         mDrawerLayout.closeDrawers();
                         return true;

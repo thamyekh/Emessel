@@ -149,7 +149,6 @@ public class MSLViewFragment extends Fragment
         final EditText input = new EditText(context);
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Enter filename:");
-        builder.setCancelable(true);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -165,7 +164,7 @@ public class MSLViewFragment extends Fragment
                                 + MSLSQLiteHelper.DATABASE_NAME + "";
 
                         File currentDB = new File(data, currentDBPath);
-                        File saveDB = new File(sd, saveDBPath);
+                        File saveDB = new File(sd, saveDBPath + ".db");
 
                         if (currentDB.exists()) {
                             FileChannel src = new FileInputStream(currentDB).getChannel();
@@ -188,6 +187,11 @@ public class MSLViewFragment extends Fragment
         });
 
         builder.show();
+    }
+
+    public void loadList(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Enter filename:");
     }
 
     @Override
@@ -231,5 +235,4 @@ public class MSLViewFragment extends Fragment
     public void lockAddItem(boolean b) {
         mTxtItem.setEnabled(b);
     }
-
 }
