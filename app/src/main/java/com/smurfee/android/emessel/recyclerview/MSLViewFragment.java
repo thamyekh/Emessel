@@ -9,7 +9,6 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -23,20 +22,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.smurfee.android.emessel.MainActivity;
 import com.smurfee.android.emessel.R;
 import com.smurfee.android.emessel.databinding.FragmentMslViewBinding;
 import com.smurfee.android.emessel.db.MSLContentProvider;
-import com.smurfee.android.emessel.db.MSLSQLiteHelper;
 import com.smurfee.android.emessel.db.MSLTable;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -145,7 +143,6 @@ public class MSLViewFragment extends Fragment
          *  Concat .db to filename if it doesn't exist
          */
 
-        final String packageName = context.getPackageName();
         final EditText input = new EditText(context);
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Enter filename:");
@@ -154,29 +151,15 @@ public class MSLViewFragment extends Fragment
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String saveDBPath = input.getText().toString();
+                String newDBfilename = input.getText().toString();
                 try {
-                    File sd = Environment.getExternalStorageDirectory();
-                    File data = Environment.getDataDirectory();
-
-                    if (sd.canWrite()) {
-                        String currentDBPath = "//data//" + packageName + "//databases//"
-                                + MSLSQLiteHelper.DATABASE_NAME + "";
-
-                        File currentDB = new File(data, currentDBPath);
-                        File saveDB = new File(sd, saveDBPath + ".db");
-
-                        if (currentDB.exists()) {
-                            FileChannel src = new FileInputStream(currentDB).getChannel();
-                            FileChannel dst = new FileOutputStream(saveDB).getChannel();
-                            dst.transferFrom(src, 0, src.size());
-                            src.close();
-                            dst.close();
-                        }
-                    }
+                    File databaseFile = getActivity().getDatabasePath("msl.db");
+                    File oldDatabaseFile = new File(databaseFile.getParentFile(), newDBfilename + ".db");
+                    databaseFile.renameTo(oldDatabaseFile);
                 } catch (Exception e) {
-
+                    Toast.makeText(getActivity(), "Save Failed", Toast.LENGTH_SHORT);
                 }
+                Toast.makeText(getActivity(), "Save Successful", Toast.LENGTH_SHORT);
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -190,8 +173,21 @@ public class MSLViewFragment extends Fragment
     }
 
     public void loadList(Context context) {
+        File data = getActivity().getDatabasePath("msl.db");
+
+        File currentDB = new File(data.getParent());
+        String[] filenames = currentDB.list();
+
+        if (filenames == null) return;
+        ListView shoppingLists = new ListView(context);
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Enter filename:");
+        ArrayAdapter<String> loadAdapter = new ArrayAdapter<>(context, R.layout.list_load, R.id.load_filename, filenames);
+
+        shoppingLists.setAdapter(loadAdapter);
+        builder.setTitle("Choose File");
+        builder.setView(shoppingLists);
+        AlertDialog loadDialog = builder.create();
+        loadDialog.show();
     }
 
     @Override

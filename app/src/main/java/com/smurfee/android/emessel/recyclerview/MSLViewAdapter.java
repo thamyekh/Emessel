@@ -423,6 +423,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             if (popupDialog.getParent() != null)
                 ((ViewGroup) popupDialog.getParent()).removeView(popupDialog);
             builder.setView(popupDialog);
+            builder.setTitle("Prices from Countdown");
             popup = builder.create();
             popup.show();
         }

@@ -2,7 +2,6 @@ package com.smurfee.android.emessel;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -12,7 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.smurfee.android.emessel.db.MSLSQLiteHelper;
@@ -63,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     case R.id.nav_save:
                         fragment.saveList(MainActivity.this);
-                        Toast.makeText(MainActivity.this, "Save Successful.", Toast.LENGTH_SHORT).show();
                         mDrawerLayout.closeDrawers();
                         return true;
                     case R.id.nav_open:
