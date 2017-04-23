@@ -141,6 +141,7 @@ public class MSLViewFragment extends Fragment
         /** TODO: CHECKS
          *  Don't save if the list is already empty
          *  Concat .db to filename if it doesn't exist
+         *  ensure that you are not allowed to use the word jornal when saving
          */
 
         final EditText input = new EditText(context);
@@ -170,24 +171,6 @@ public class MSLViewFragment extends Fragment
         });
 
         builder.show();
-    }
-
-    public void loadList(Context context) {
-        File data = getActivity().getDatabasePath("msl.db");
-
-        File currentDB = new File(data.getParent());
-        String[] filenames = currentDB.list();
-
-        if (filenames == null) return;
-        ListView shoppingLists = new ListView(context);
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        ArrayAdapter<String> loadAdapter = new ArrayAdapter<>(context, R.layout.list_load, R.id.load_filename, filenames);
-
-        shoppingLists.setAdapter(loadAdapter);
-        builder.setTitle("Choose File");
-        builder.setView(shoppingLists);
-        AlertDialog loadDialog = builder.create();
-        loadDialog.show();
     }
 
     @Override
