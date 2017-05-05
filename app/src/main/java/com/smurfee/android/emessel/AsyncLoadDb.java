@@ -3,10 +3,18 @@ package com.smurfee.android.emessel;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,8 +42,8 @@ public class AsyncLoadDb extends AsyncTask<String, Void, String[]> {
         List<String> fileNames = new ArrayList<>(Arrays.asList(currentDB.list()));
 
         Pattern p = Pattern.compile("msl.db|.*journal$");
-        for (int i = 0; i < fileNames.size(); i ++) {
-            if(p.matcher(fileNames.get(i)).matches()){
+        for (int i = 0; i < fileNames.size(); i++) {
+            if (p.matcher(fileNames.get(i)).matches()) {
                 fileNames.remove(i);
                 i--;
             }
@@ -55,5 +63,29 @@ public class AsyncLoadDb extends AsyncTask<String, Void, String[]> {
         builder.setView(shoppingLists);
         AlertDialog loadDialog = builder.create();
         loadDialog.show();
+
+        shoppingLists.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // Load the database into msl.db
+                // access MSLContentProvider to access MSLSQLiteHelper instance field
+                String inputFileName = ((TextView) view.findViewById(R.id.load_filename)).getText().toString();
+                try {
+                    InputStream mInput = new FileInputStream(inputFileName);
+                    String outFileName = YOUR_DB_PATH_HERE;
+                    OutputStream mOutput = new FileOutputStream(outFileName);
+                    byte[] mBuffer = new byte[1024];
+                    int mLength;
+                    while ((mLength = mInput.read(mBuffer)) > 0) {
+                        mOutput.write(mBuffer, 0, mLength);
+                    }
+                    mOutput.flush();
+                    mOutput.close();
+                    mInput.close();
+                    // may need to query
+                } catch (Exception e) {
+                }
+            }
+        });
     }
 }
