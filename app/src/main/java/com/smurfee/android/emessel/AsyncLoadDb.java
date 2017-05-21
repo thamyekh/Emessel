@@ -3,11 +3,14 @@ package com.smurfee.android.emessel;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.smurfee.android.emessel.db.MSLContentProvider;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,6 +31,7 @@ public class AsyncLoadDb extends AsyncTask<String, Void, String[]> {
 
     private Context context;
     private ListView shoppingLists;
+    private AlertDialog loadDialog;
 
     public AsyncLoadDb(Context context) {
         this.context = context;
@@ -61,7 +65,7 @@ public class AsyncLoadDb extends AsyncTask<String, Void, String[]> {
         shoppingLists.setAdapter(loadAdapter);
         builder.setTitle("Choose File");
         builder.setView(shoppingLists);
-        AlertDialog loadDialog = builder.create();
+        loadDialog = builder.create();
         loadDialog.show();
 
         shoppingLists.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -70,10 +74,10 @@ public class AsyncLoadDb extends AsyncTask<String, Void, String[]> {
                 // Load the database into msl.db
                 // access MSLContentProvider to access MSLSQLiteHelper instance field
                 String inputFileName = ((TextView) view.findViewById(R.id.load_filename)).getText().toString();
+                File dbPath = context.getDatabasePath("msl.db");
                 try {
-                    InputStream mInput = new FileInputStream(inputFileName);
-                    String outFileName = YOUR_DB_PATH_HERE;
-                    OutputStream mOutput = new FileOutputStream(outFileName);
+                    InputStream mInput = new FileInputStream(new File(dbPath.getParentFile(), inputFileName));
+                    OutputStream mOutput = new FileOutputStream(context.getDatabasePath("msl.db"));
                     byte[] mBuffer = new byte[1024];
                     int mLength;
                     while ((mLength = mInput.read(mBuffer)) > 0) {
@@ -85,6 +89,9 @@ public class AsyncLoadDb extends AsyncTask<String, Void, String[]> {
                     // may need to query
                 } catch (Exception e) {
                 }
+                //TODO Close builder refresh sql
+                loadDialog.dismiss();
+                context.getContentResolver().notifyChange(MSLContentProvider.CONTENT_URI, null);
             }
         });
     }

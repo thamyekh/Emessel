@@ -158,9 +158,7 @@ public class MSLViewFragment extends Fragment
                     File oldDatabaseFile = new File(databaseFile.getParentFile(), newDBfilename + ".db");
                     databaseFile.renameTo(oldDatabaseFile);
                 } catch (Exception e) {
-                    Toast.makeText(getActivity(), "Save Failed", Toast.LENGTH_SHORT);
                 }
-                Toast.makeText(getActivity(), "Save Successful", Toast.LENGTH_SHORT);
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
