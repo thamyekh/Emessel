@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.smurfee.android.emessel.db.AsyncDeleteDb;
+import com.smurfee.android.emessel.db.AsyncLoadDb;
 import com.smurfee.android.emessel.db.MSLSQLiteHelper;
 import com.smurfee.android.emessel.recyclerview.MSLViewFragment;
 
@@ -48,11 +50,11 @@ public class MainActivity extends AppCompatActivity {
         mDrawerToggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
 
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
-                switch (item.getItemId()){
+                switch (item.getItemId()) {
                     case R.id.nav_new:
                         deleteDatabase(MSLSQLiteHelper.DATABASE_NAME);
                         fragment.deleteList(MainActivity.this);
@@ -65,11 +67,10 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     case R.id.nav_open:
                         new AsyncLoadDb(MainActivity.this).execute();
-                        Toast.makeText(MainActivity.this, "not implemented yet...", Toast.LENGTH_SHORT).show();
                         mDrawerLayout.closeDrawers();
                         return true;
                     case R.id.nav_delete:
-                        Toast.makeText(MainActivity.this, "not implemented yet...", Toast.LENGTH_SHORT).show();
+                        new AsyncDeleteDb(MainActivity.this).execute();
                         mDrawerLayout.closeDrawers();
                         return true;
                     case R.id.nav_sms:
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         if (fragment != null && fragment.isInLayout()) fragment.deleteItems(this);
     }
 
-    public void hideKeyboard(){
+    public void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }

@@ -1,4 +1,4 @@
-package com.smurfee.android.emessel;
+package com.smurfee.android.emessel.db;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.smurfee.android.emessel.R;
 import com.smurfee.android.emessel.db.MSLContentProvider;
 
 import java.io.File;
@@ -29,9 +30,9 @@ import java.util.regex.Pattern;
 
 public class AsyncLoadDb extends AsyncTask<String, Void, String[]> {
 
-    private Context context;
-    private ListView shoppingLists;
-    private AlertDialog loadDialog;
+    protected Context context;
+    protected ListView shoppingLists;
+    protected AlertDialog loadDialog;
 
     public AsyncLoadDb(Context context) {
         this.context = context;
@@ -89,7 +90,7 @@ public class AsyncLoadDb extends AsyncTask<String, Void, String[]> {
                     // may need to query
                 } catch (Exception e) {
                 }
-                //TODO Close builder refresh sql
+
                 loadDialog.dismiss();
                 context.getContentResolver().notifyChange(MSLContentProvider.CONTENT_URI, null);
             }
