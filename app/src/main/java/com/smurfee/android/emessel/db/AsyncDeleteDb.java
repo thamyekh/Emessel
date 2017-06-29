@@ -1,24 +1,15 @@
 package com.smurfee.android.emessel.db;
 
 import android.content.Context;
-import android.os.AsyncTask;
+import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
-import android.view.View;
-import android.widget.AdapterView;
+import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
+import com.smurfee.android.emessel.CheckboxAdapter;
 import com.smurfee.android.emessel.R;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Created by Yek on 24/05/2017.
@@ -26,20 +17,46 @@ import java.util.regex.Pattern;
 
 public class AsyncDeleteDb extends AsyncLoadDb {
 
+    ArrayAdapter<String> loadAdapter;
+
     public AsyncDeleteDb(Context context) {
         super(context);
+
     }
 
     @Override
     protected void onPostExecute(final String[] result) {
         if (result == null) return;
-
+        //TODO: databind the list_delete.xml and also mark checkbox when whole relative view is clicked
+        loadAdapter = new CheckboxAdapter(context, R.layout.list_delete, R.id.delete_filename, R.id.checkbox_delete, result);
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        ArrayAdapter<String> loadAdapter = new ArrayAdapter<>(context, R.layout.list_delete, R.id.delete_filename, result);
 
         shoppingLists.setAdapter(loadAdapter);
         builder.setTitle("Choose File");
         builder.setView(shoppingLists);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                boolean[] markedForDeletion = ((CheckboxAdapter)loadAdapter).getMarkedForDeletion();
+                File dbPath = context.getDatabasePath("msl.db");
+
+                for (int i = 0; i < result.length; i++) {
+                    Log.d("deleting", result[i] + " " + markedForDeletion[i]);
+                    if(markedForDeletion[i]){
+                        context.deleteDatabase(result[i]);
+                        Log.d("deleted", result[i]);
+                    }
+                }
+            }
+        });
+
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
         loadDialog = builder.create();
         loadDialog.show();
 

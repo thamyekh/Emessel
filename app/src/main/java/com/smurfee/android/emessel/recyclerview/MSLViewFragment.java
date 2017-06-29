@@ -155,7 +155,7 @@ public class MSLViewFragment extends Fragment
                 String newDBfilename = input.getText().toString();
                 try {
                     File databaseFile = getActivity().getDatabasePath("msl.db");
-                    File oldDatabaseFile = new File(databaseFile.getParentFile(), newDBfilename + ".db");
+                    File oldDatabaseFile = new File(databaseFile.getParentFile(), newDBfilename);
                     databaseFile.renameTo(oldDatabaseFile);
                 } catch (Exception e) {
                 }
