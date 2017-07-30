@@ -1,9 +1,10 @@
 package com.smurfee.android.emessel.db;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -11,12 +12,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.smurfee.android.emessel.R;
-import com.smurfee.android.emessel.db.MSLContentProvider;
+import com.smurfee.android.emessel.recyclerview.MSLTouchListener;
+import com.smurfee.android.emessel.recyclerview.MSLViewAdapter;
+import com.smurfee.android.emessel.recyclerview.MSLViewFragment;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -31,11 +33,13 @@ import java.util.regex.Pattern;
 public class AsyncLoadDb extends AsyncTask<String, Void, String[]> {
 
     protected Context context;
+    protected MSLViewAdapter adapter;
     protected ListView shoppingLists;
     protected AlertDialog loadDialog;
 
-    public AsyncLoadDb(Context context) {
+    public AsyncLoadDb(Context context, MSLViewAdapter adapter) {
         this.context = context;
+        this.adapter = adapter;
         this.shoppingLists = new ListView(context);
     }
 
@@ -61,7 +65,7 @@ public class AsyncLoadDb extends AsyncTask<String, Void, String[]> {
         if (result == null) return;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        ArrayAdapter<String> loadAdapter = new ArrayAdapter<>(context, R.layout.list_load, R.id.load_filename, result);
+        ArrayAdapter<String> loadAdapter = new ArrayAdapter<>(context, R.layout.list_open, R.id.load_filename, result);
 
         shoppingLists.setAdapter(loadAdapter);
         builder.setTitle("Choose File");
@@ -72,8 +76,12 @@ public class AsyncLoadDb extends AsyncTask<String, Void, String[]> {
         shoppingLists.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // Clear the current list
                 // Load the database into msl.db
-                // access MSLContentProvider to access MSLSQLiteHelper instance field
+                // Refresh the current list to show loaded db
+
+                context.getContentResolver().delete(MSLContentProvider.CONTENT_URI, null, null);
+
                 String inputFileName = ((TextView) view.findViewById(R.id.load_filename)).getText().toString();
                 File dbPath = context.getDatabasePath("msl.db");
                 try {
@@ -92,7 +100,9 @@ public class AsyncLoadDb extends AsyncTask<String, Void, String[]> {
                 }
 
                 loadDialog.dismiss();
-                context.getContentResolver().notifyChange(MSLContentProvider.CONTENT_URI, null);
+
+                SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbPath, null);
+                adapter.changeCursor(db.rawQuery("select * from " + MSLTable.TABLE_MSL, null));
             }
         });
     }

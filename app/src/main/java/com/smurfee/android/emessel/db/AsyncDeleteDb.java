@@ -20,8 +20,7 @@ public class AsyncDeleteDb extends AsyncLoadDb {
     ArrayAdapter<String> loadAdapter;
 
     public AsyncDeleteDb(Context context) {
-        super(context);
-
+        super(context, null);
     }
 
     @Override

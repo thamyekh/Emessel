@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                         mDrawerLayout.closeDrawers();
                         return true;
                     case R.id.nav_open:
-                        new AsyncLoadDb(MainActivity.this).execute();
+                        fragment.openList(MainActivity.this);
                         mDrawerLayout.closeDrawers();
                         return true;
                     case R.id.nav_delete:

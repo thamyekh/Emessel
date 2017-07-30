@@ -22,15 +22,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import com.smurfee.android.emessel.MainActivity;
 import com.smurfee.android.emessel.R;
 import com.smurfee.android.emessel.databinding.FragmentMslViewBinding;
+import com.smurfee.android.emessel.db.AsyncLoadDb;
 import com.smurfee.android.emessel.db.MSLContentProvider;
 import com.smurfee.android.emessel.db.MSLTable;
 
@@ -140,7 +138,6 @@ public class MSLViewFragment extends Fragment
     public void saveList(Context context) {
         /** TODO: CHECKS
          *  Don't save if the list is already empty
-         *  Concat .db to filename if it doesn't exist
          *  ensure that you are not allowed to use the word jornal when saving
          */
 
@@ -169,6 +166,10 @@ public class MSLViewFragment extends Fragment
         });
 
         builder.show();
+    }
+
+    public void openList(Context context) {
+        new AsyncLoadDb(context, mAdapter).execute();
     }
 
     @Override
