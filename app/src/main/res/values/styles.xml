@@ -15,7 +15,7 @@
     </style>
 
     <style name="MSLToolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:textColorPrimary">@color/text_icon</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
         <item name="android:background">@color/primary</item>
     </style>
     <style name="MSLToolbar.Title" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">

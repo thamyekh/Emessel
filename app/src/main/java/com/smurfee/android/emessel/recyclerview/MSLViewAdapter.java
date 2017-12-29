@@ -6,20 +6,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.databinding.ObservableInt;
-import android.os.AsyncTask;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,13 +21,9 @@ import com.smurfee.android.emessel.MainActivity;
 import com.smurfee.android.emessel.R;
 import com.smurfee.android.emessel.db.MSLContentProvider;
 import com.smurfee.android.emessel.db.MSLTable;
+import com.smurfee.android.emessel.pricefinder.PriceFinder;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -52,12 +41,18 @@ import java.util.Set;
 public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHolder> {
 
     private Context mContext;
+
+    public Context getContext() {
+        return mContext;
+    }
+
     private Cursor mCursor;
     private DataSetObserver mDataSetObserver;
     private boolean mDataValid;
     private int mRowIdColumn;
     private int mExpandedPosition = -1;
-    private MSLViewFragment mFragment;
+    private RecyclerView mRecyclerView;
+//    private MSLViewFragment mFragment;
 
     public final ObservableInt observableInt = new ObservableInt();
 
@@ -72,8 +67,8 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         if (mCursor != null) {
             mCursor.registerDataSetObserver(mDataSetObserver);
         }
-        mFragment = (MSLViewFragment) ((MainActivity) mContext)
-                .getSupportFragmentManager().findFragmentById(R.id.fragment_recycler_msl);
+//        mFragment = (MSLViewFragment) ((MainActivity) mContext)
+//                .getSupportFragmentManager().findFragmentById(R.id.fragment_recycler_msl);
 
     }
 
@@ -131,8 +126,9 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         super.setHasStableIds(true);
     }
 
+
     /**
-     * Populates the Recycler View with all rows in the cursor from scratch.
+     * Populates the Recycler View with all rows in the cursor.
      *
      * @param cursor Cursor containing all records queried from the database
      */
@@ -256,30 +252,29 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView label;
+        TextView label, note, price;
         ImageView icon;
-        TextView note;
-        TextView price;
         View expanded;
-        Button btnFind;
-        Button btnDone;
-        Button btnCancel;
+        Button btnFind, btnDone, btnCancel;
+        EditText edit;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            icon = (ImageView) itemView.findViewById(R.id.icon);
-            label = (TextView) itemView.findViewById(R.id.label);
-            note = (TextView) itemView.findViewById(R.id.note);
-            price = (TextView) itemView.findViewById(R.id.price);
+            icon = itemView.findViewById(R.id.icon);
+            label = itemView.findViewById(R.id.label);
+            note = itemView.findViewById(R.id.note);
+            price = itemView.findViewById(R.id.price);
 
             expanded = itemView.findViewById(R.id.expanded);
             expanded.setOnTouchListener(MSLTouchListener.newOnTouchListener());
 
-            btnFind = (Button) expanded.findViewById(R.id.find);
+            btnFind = expanded.findViewById(R.id.find);
             btnFind.setOnClickListener(findClickListener());
-            btnDone = (Button) expanded.findViewById(R.id.done);
+            btnDone = expanded.findViewById(R.id.done);
             btnDone.setOnClickListener(doneClickListener());
-            btnCancel = (Button) expanded.findViewById(R.id.cancel);
+            btnCancel = expanded.findViewById(R.id.cancel);
+            btnCancel.setOnClickListener(cancelClickListener());
+            edit = expanded.findViewById(R.id.edit_label);
 
         }
 
@@ -287,7 +282,12 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             return new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    new PriceFinder(itemView).execute(((EditText) expanded.findViewById(R.id.edit_label)).getText().toString());
+                    TextView price = itemView.findViewById(R.id.edit_price);
+                    EditText label = expanded.findViewById(R.id.edit_label);
+                    WeakReference<Context> refContext = new WeakReference<>(mContext);
+                    WeakReference<TextView> refPrice = new WeakReference<>(price);
+
+                    new PriceFinder(refContext, refPrice).execute(label.getText().toString());
                 }
             };
         }
@@ -323,7 +323,23 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
                     ((RecyclerView) ((Activity) mContext).findViewById(R.id.recycler_msl))
                             .requestDisallowInterceptTouchEvent(false);
 
-                    ((MainActivity) mContext).hideKeyboard();
+                    MainActivity.hideKeyboard(mContext, expanded);
+                }
+            };
+        }
+
+        public View.OnClickListener cancelClickListener() {
+            return new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = getAdapterPosition();
+                    MSLViewAdapter adapter = getAdapter();
+                    adapter.setExpandedPosition(RecyclerView.NO_POSITION);
+                    adapter.notifyItemChanged(position);
+                    ((RecyclerView) ((Activity) mContext).findViewById(R.id.recycler_msl))
+                            .requestDisallowInterceptTouchEvent(false);
+
+                    MainActivity.hideKeyboard(mContext, expanded.findFocus());
                 }
             };
         }
@@ -332,7 +348,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             label.setVisibility(View.VISIBLE);
             icon.setVisibility(View.VISIBLE);
             expanded.setVisibility(View.GONE);
-            mFragment.lockAddItem(true);
+            edit.setEnabled(false);
         }
 
         public void expand(MSLRowView current) {
@@ -347,7 +363,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
                 ((EditText) expanded.findViewById(R.id.edit_notes)).setText(current.getNote());
             if (current.getPrice() != null)
                 ((EditText) expanded.findViewById(R.id.edit_price)).setText(current.getPrice().toPlainString());
-            mFragment.lockAddItem(false);
+            edit.setEnabled(true);
         }
 
         public void displayOptionalDetails(MSLRowView current) {
@@ -367,76 +383,6 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
                 price.setVisibility(View.VISIBLE);
                 price.setText("$" + current.getPrice().toPlainString());
             }
-        }
-    }
-
-    private class PriceFinder extends AsyncTask<String, Void, String[]> {
-
-        private ListView popupDialog;
-        private TextView updatePrice;
-        private AlertDialog popup;
-
-        public PriceFinder(View updatePrice) {
-            this.updatePrice = (TextView) updatePrice.findViewById(R.id.edit_price);
-        }
-
-        @Override
-        protected String[] doInBackground(String... keyword) {
-            try {
-                Document doc = Jsoup.connect("https://shop.countdown.co.nz/Shop/SearchProducts?search=" + keyword[0]).get();
-                Elements product = doc.select("#product-list .details-container.row-fluid.mrow-fluid");
-
-                print("\nItem Name: (%d)", product.size());
-                List<String> printout = new ArrayList<>();
-                for (Element cls : product) {  //TODO: Include club price, non-club price and volume
-                    String productName = trim(cls.select(".description.span12.mspan8").text(), 35);
-                    String productPrice = cls.select(".din-medium").first().text().split(" ", 2)[0];
-                    printout.add(String.format(" * %s. \n %s", productName, productPrice));
-                }
-                String[] priceResult = printout.toArray(new String[printout.size()]);
-
-                return priceResult;
-            } catch (IOException e) {
-            }
-            return null;
-        }
-
-        protected void onPostExecute(final String[] result) {
-            if (result == null) return;
-
-            popupDialog = new ListView(mContext);
-            ArrayAdapter<String> popupAdapter = new ArrayAdapter<>(mContext, R.layout.list_price, R.id.result_item, result);
-            popupDialog.setAdapter(popupAdapter);
-            popupDialog.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
-                    String resultRow = ((TextView) view.findViewById(R.id.result_item)).getText().toString();
-                    String[] tokens = TextUtils.split(resultRow, "\\$");
-                    if (tokens.length == 0) return; // return if there is no price
-                    updatePrice.setText(tokens[tokens.length - 1]);
-                    popup.cancel();
-                }
-            });
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-            builder.setCancelable(true);
-            if (popupDialog.getParent() != null)
-                ((ViewGroup) popupDialog.getParent()).removeView(popupDialog);
-            builder.setView(popupDialog);
-            builder.setTitle("Prices from Countdown");
-            popup = builder.create();
-            popup.show();
-        }
-
-        private String trim(String s, int width) {
-            if (s.length() > width)
-                return s.substring(0, width - 1) + ".";
-            else
-                return s + ".";
-        }
-
-        private void print(String msg, Object... args) {
-            Log.d("JSoup", String.format(msg, args));
         }
     }
 }

@@ -16,6 +16,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.smurfee.android.emessel.MainActivity;
 import com.smurfee.android.emessel.R;
@@ -31,6 +33,7 @@ import com.smurfee.android.emessel.databinding.FragmentMslViewBinding;
 import com.smurfee.android.emessel.db.AsyncLoadDb;
 import com.smurfee.android.emessel.db.MSLContentProvider;
 import com.smurfee.android.emessel.db.MSLTable;
+import com.smurfee.android.emessel.swipe.MSLCallback;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,12 +44,17 @@ import java.util.Set;
  * A {@link Fragment} class used to hold a RecyclerView to display Shopping List items.
  *
  * @author smurfee
- * @version 2017.4.3
+ * @version 2017.12.25
  */
 public class MSLViewFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 
     private RecyclerView mRecyclerView;
+
+    public RecyclerView getRecyclerView() {
+        return mRecyclerView;
+    }
+
     private MSLViewAdapter mAdapter;
     private EditText mTxtItem;
     private ImageView mEmptyView;
@@ -84,6 +92,11 @@ public class MSLViewFragment extends Fragment
 
         mRecyclerView.addOnItemTouchListener(new MSLTouchListener(getActivity(), mRecyclerView,
                 MSLTouchListener.newClickListener(mAdapter, mRecyclerView)));
+
+        // Uses ItemTouchHelper to perform swipe to check price
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new MSLCallback(mAdapter));
+        itemTouchHelper.attachToRecyclerView(mRecyclerView);
+
         getLoaderManager().initLoader(0, null, this);
 
         return binding.getRoot();
@@ -202,15 +215,10 @@ public class MSLViewFragment extends Fragment
         switch (v.getId()) {
             case R.id.btn_add_item:
                 addItem();
-                // close keyboard
-                ((MainActivity) getActivity()).hideKeyboard();
+                MainActivity.hideKeyboard(getContext(), mTxtItem);
                 mTxtItem.getText().clear();
                 mTxtItem.clearFocus();
                 break;
         }
-    }
-
-    public void lockAddItem(boolean b) {
-        mTxtItem.setEnabled(b);
     }
 }
