@@ -1,57 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="72dp"
-    android:animateLayoutChanges="true"
-    android:background="@drawable/selector_row">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ImageView
-        android:id="@+id/icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="24dp"
-        android:layout_marginStart="24dp"
-        android:src="@drawable/ic_priority_light_blue_300_48dp" />
+    <data>
 
-    <TextView
-        android:id="@+id/label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="48dp"
-        android:layout_marginStart="48dp"
-        android:layout_toEndOf="@+id/icon"
-        android:layout_toRightOf="@+id/icon"
-        android:textSize="20sp" />
+        <variable
+            name="priority"
+            type="java.lang.Boolean" />
+    </data>
 
-    <TextView
-        android:id="@+id/note"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/label"
-        android:text="test note"
-        android:textSize="12sp"
-        android:layout_alignLeft="@id/label"
-        android:layout_alignStart="@id/label" />
-
-    <TextView
-        android:id="@+id/price"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="10dp"
-        android:text="test price"
-        android:textSize="12sp" />
-
-    <include
-        android:id="@+id/expanded"
-        layout="@layout/list_row_expanded"
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/label"
-        android:visibility="gone" />
+        android:animateLayoutChanges="true"
+        android:background="@drawable/selector_row"
+        android:minHeight="72dp">
 
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="24dp"
+            android:layout_marginStart="24dp"
+            android:src="@{priority ? @drawable/ic_priority_light_blue_300_48dp : @drawable/ic_priority_red_300_48dp}" />
+        <!-- android:src="@drawable/ic_priority_light_blue_300_48dp" /> -->
+
+        <TextView
+            android:id="@+id/label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="48dp"
+            android:layout_marginStart="48dp"
+            android:layout_toEndOf="@+id/icon"
+            android:layout_toRightOf="@+id/icon"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/note"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/label"
+            android:layout_alignStart="@id/label"
+            android:layout_below="@+id/label"
+            android:text="test note"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:text="test price"
+            android:textSize="12sp" />
+
+        <include
+            android:id="@+id/expanded"
+            layout="@layout/list_row_expanded"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/label"
+            android:visibility="gone" />
+    </RelativeLayout>
+</layout>

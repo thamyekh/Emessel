@@ -12,7 +12,7 @@ public class MSLRowView {
     private String mNote;
     private BigDecimal mPrice;
     private boolean mChecked;
-    private int priority; //TODO implement with database
+    private boolean mPriority;
 
     public MSLRowView(long id, String label) {
         mId = id;
@@ -49,7 +49,11 @@ public class MSLRowView {
         return mChecked;
     }
 
-    public void setChecked(boolean mChecked) {
-        this.mChecked = mChecked;
+    public void setChecked(boolean checked) {
+        this.mChecked = checked;
     }
+
+    public boolean getPriority() { return mPriority; }
+
+    public void setPriority(boolean priority) { this.mPriority = priority; }
 }

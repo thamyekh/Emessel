@@ -169,7 +169,8 @@ public class MSLContentProvider extends ContentProvider {
                 MSLTable.COLUMN_LABEL,
                 MSLTable.COLUMN_ID,
                 MSLTable.COLUMN_NOTE,
-                MSLTable.COLUMN_PRICE};
+                MSLTable.COLUMN_PRICE,
+                MSLTable.COLUMN_PRIORITY};
         if (projection != null) {
             HashSet<String> requestedColumns = new HashSet<String>(Arrays.asList(projection));
             HashSet<String> availableColumns = new HashSet<String>(Arrays.asList(available));

@@ -13,7 +13,7 @@ public class MSLTable {
     public static final String COLUMN_LABEL = "label";
     public static final String COLUMN_NOTE = "note";
     public static final String COLUMN_PRICE = "price";
-    public static final String COLUMN_PRIORITY = "priority"; //TODO implement
+    public static final String COLUMN_PRIORITY = "priority";
 
     //create database
     private static final String DATABASE_CREATE = "CREATE TABLE "
@@ -21,7 +21,8 @@ public class MSLTable {
             + COLUMN_ID + " integer primary key autoincrement, "
             + COLUMN_LABEL + " text not null,"
             + COLUMN_NOTE + ", "
-            + COLUMN_PRICE + ");";
+            + COLUMN_PRICE + ", "
+            + COLUMN_PRIORITY + ");";
 
     public static void onCreate(SQLiteDatabase database){
         database.execSQL(DATABASE_CREATE);

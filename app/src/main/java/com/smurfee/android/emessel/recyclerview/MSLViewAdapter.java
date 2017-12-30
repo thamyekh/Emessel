@@ -76,6 +76,11 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_row, parent, false);
+        //https://medium.com/google-developers/android-data-binding-recyclerview-db7c40d9f0e4
+        MainActivityBinding binding = DataBindingUtil.setContentView(this, R.layout.main_activity);
+        User user = new User("Test", "User");
+        binding.setUser(user);
+
         return new ViewHolder(itemView);
     }
 
@@ -149,6 +154,11 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
                 if (!cursor.isNull(cursor.getColumnIndex(MSLTable.COLUMN_PRICE))) {
                     String price = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_PRICE));
                     mslItem.setPrice(price);
+                }
+                if (!cursor.isNull(cursor.getColumnIndex(MSLTable.COLUMN_PRIORITY))) {
+                    boolean priority = (cursor.getInt(cursor
+                            .getColumnIndex(MSLTable.COLUMN_PRIORITY)) == 1);
+                    mslItem.setPriority(priority);
                 }
 
                 mRows.add(mslItem);
