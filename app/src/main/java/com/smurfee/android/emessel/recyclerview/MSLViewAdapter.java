@@ -77,9 +77,9 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_row, parent, false);
         //https://medium.com/google-developers/android-data-binding-recyclerview-db7c40d9f0e4
-        MainActivityBinding binding = DataBindingUtil.setContentView(this, R.layout.main_activity);
-        User user = new User("Test", "User");
-        binding.setUser(user);
+//        MainActivityBinding binding = DataBindingUtil.setContentView(this, R.layout.main_activity);
+//        User user = new User("Test", "User");
+//        binding.setUser(user);
 
         return new ViewHolder(itemView);
     }
