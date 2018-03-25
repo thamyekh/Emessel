@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.smurfee.android.emessel.MainActivity;
 import com.smurfee.android.emessel.R;
+import com.smurfee.android.emessel.databinding.ListRowBinding;
 import com.smurfee.android.emessel.db.MSLContentProvider;
 import com.smurfee.android.emessel.db.MSLTable;
 import com.smurfee.android.emessel.pricefinder.PriceFinder;
@@ -74,14 +75,13 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_row, parent, false);
-        //https://medium.com/google-developers/android-data-binding-recyclerview-db7c40d9f0e4
-//        MainActivityBinding binding = DataBindingUtil.setContentView(this, R.layout.main_activity);
-//        User user = new User("Test", "User");
-//        binding.setUser(user);
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
 
-        return new ViewHolder(itemView);
+        View itemView = layoutInflater.inflate(R.layout.list_row, parent, false);
+
+        //https://medium.com/google-developers/android-data-binding-recyclerview-db7c40d9f0e4
+        ListRowBinding binding = ListRowBinding.inflate(layoutInflater, parent, false);
+        return new ViewHolder(itemView, binding);
     }
 
     @Override
@@ -268,7 +268,9 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         Button btnFind, btnDone, btnCancel;
         EditText edit;
 
-        public ViewHolder(View itemView) {
+        private final ListRowBinding binding;
+
+        public ViewHolder(View itemView, ListRowBinding binding) {
             super(itemView);
             icon = itemView.findViewById(R.id.icon);
             label = itemView.findViewById(R.id.label);
@@ -286,6 +288,12 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             btnCancel.setOnClickListener(cancelClickListener());
             edit = expanded.findViewById(R.id.edit_label);
 
+            this.binding = binding;
+
+        }
+
+        public void bind(boolean priority) {
+            binding.setPriority(priority);
         }
 
         private View.OnClickListener findClickListener() {
