@@ -104,7 +104,11 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             holder.icon.setImageResource(R.drawable.ic_check_circle_black_48dp);
         } else {
             holder.itemView.setSelected(false);
-            holder.icon.setImageResource(R.drawable.ic_priority_light_blue_300_48dp);
+            if (current.getPriority())
+                holder.icon.setImageResource(R.drawable.ic_priority_red_300_48dp);
+            else
+                holder.icon.setImageResource(R.drawable.ic_priority_light_blue_300_48dp);
+//            holder.bind(current.getPriority());
         }
     }
 
@@ -294,6 +298,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
 
         public void bind(boolean priority) {
             binding.setPriority(priority);
+            binding.executePendingBindings();
         }
 
         private View.OnClickListener findClickListener() {

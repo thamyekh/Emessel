@@ -67,7 +67,7 @@ public class MSLCallback extends ItemTouchHelper.Callback {
                             float dX, float dY, int actionState, boolean isCurrentlyActive) {
 
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-            Bitmap icon;
+//            Bitmap icon;
             float left, top, right, bottom;
             Resources resource = mAdapter.getContext().getResources();
             View itemView = viewHolder.itemView;
