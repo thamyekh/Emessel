@@ -52,7 +52,7 @@ public class PriceFinder extends AsyncTask<String, Void, String[]> {
     @Override
     protected String[] doInBackground(String... keyword) {
         try {
-            Document doc = Jsoup.connect("https://shop.countdown.co.nz/Shop/SearchProducts?search=" + keyword[0]).get();
+            Document doc = Jsoup.connect("https://shop.countdown.co.nz/shop/searchproducts?search=" + keyword[0]).get();
             Elements product = doc.select("#product-list .gridProductStamp.gridStamp");
 
 //            print("\nItem Name: %s, (%d)", keyword[0], product.size()); // XXX: Debugging

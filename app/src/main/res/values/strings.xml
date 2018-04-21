@@ -11,5 +11,7 @@
     <string name="title_activity_msldetail">MSLDetailActivity</string>
     <string name="drawer_open">Opens the navigation drawer.</string>
     <string name="drawer_close">Closes the navigation drawer.</string>
+    <string name="priority_high">ic_priority_red_300_48dp</string>
+    <string name="priority_low">ic_priority_light_blue_300_48dp</string>
 
 </resources>

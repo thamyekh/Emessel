@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.smurfee.android.emessel.R;
@@ -58,6 +59,18 @@ public class MSLCallback extends ItemTouchHelper.Callback {
             new PriceFinder(refContext, refPrice, viewHolder.getAdapterPosition()).execute(label);
         } else {
             // Cycle Through Priority
+            boolean newPriority = mAdapter.changePriority(viewHolder.getAdapterPosition());
+            //change tag
+            ImageView icon = viewHolder.itemView.findViewById(R.id.icon);
+            if (newPriority)
+                icon.setTag("ic_priority_red_300_48dp");
+            else icon.setTag("ic_priority_light_blue_300_48dp");
+            Log.d("priority",String.valueOf(newPriority));
+
+            TextView label = viewHolder.itemView.findViewById(R.id.label);
+            ((EditText) viewHolder.itemView.findViewById(R.id.edit_label)).setText(label.getText());
+            Button btnDone = viewHolder.itemView.findViewById(R.id.done);
+            btnDone.callOnClick();
         }
         mAdapter.notifyItemChanged(viewHolder.getAdapterPosition());
     }
@@ -92,7 +105,6 @@ public class MSLCallback extends ItemTouchHelper.Callback {
 
                 RectF background = new RectF(left, top, right, bottom);
                 c.drawRect(background, paint);
-
 
 
                 left = (float) itemView.getRight() - 2 * width;

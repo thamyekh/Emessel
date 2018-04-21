@@ -5,6 +5,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.databinding.DataBindingUtil;
+import android.databinding.ObservableBoolean;
 import android.databinding.ObservableInt;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -52,10 +54,9 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     private boolean mDataValid;
     private int mRowIdColumn;
     private int mExpandedPosition = -1;
-    private RecyclerView mRecyclerView;
-//    private MSLViewFragment mFragment;
 
     public final ObservableInt observableInt = new ObservableInt();
+    public final ObservableBoolean isPriority = new ObservableBoolean();
 
     private List<MSLRowView> mRows = new ArrayList<>();
     private Set<Long> mDeleteSet = new LinkedHashSet<>();
@@ -63,14 +64,11 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     public MSLViewAdapter(Context context, Cursor cursor) {
         mContext = context;
         mCursor = cursor;
-        mRowIdColumn = mDataValid ? mCursor.getColumnIndex(MSLTable.COLUMN_ID) : -1;
+        mRowIdColumn = mDataValid ? mCursor.getColumnIndex(MSLTable.COLUMN_ID) : -2;
         mDataSetObserver = new MSLDataSetObserver();
         if (mCursor != null) {
             mCursor.registerDataSetObserver(mDataSetObserver);
         }
-//        mFragment = (MSLViewFragment) ((MainActivity) mContext)
-//                .getSupportFragmentManager().findFragmentById(R.id.fragment_recycler_msl);
-
     }
 
     @Override
@@ -79,9 +77,9 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
 
         View itemView = layoutInflater.inflate(R.layout.list_row, parent, false);
 
-        //https://medium.com/google-developers/android-data-binding-recyclerview-db7c40d9f0e4
-        ListRowBinding binding = ListRowBinding.inflate(layoutInflater, parent, false);
-        return new ViewHolder(itemView, binding);
+        ListRowBinding listRowBinding = DataBindingUtil.inflate(layoutInflater, R.layout.list_row, parent, false);
+        listRowBinding.setAdapter(getAdapter());
+        return new ViewHolder(itemView);
     }
 
     @Override
@@ -104,11 +102,11 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             holder.icon.setImageResource(R.drawable.ic_check_circle_black_48dp);
         } else {
             holder.itemView.setSelected(false);
-            if (current.getPriority())
-                holder.icon.setImageResource(R.drawable.ic_priority_red_300_48dp);
-            else
-                holder.icon.setImageResource(R.drawable.ic_priority_light_blue_300_48dp);
-//            holder.bind(current.getPriority());
+//            if (current.getPriority()) TODO: Remove
+//                holder.icon.setImageResource(R.drawable.ic_priority_red_300_48dp);
+//            else
+//                holder.icon.setImageResource(R.drawable.ic_priority_light_blue_300_48dp);
+            isPriority.set(current.getPriority());
         }
     }
 
@@ -230,7 +228,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
                 notifyDataSetChanged();
             }
         } else {
-            mRowIdColumn = -1;
+            mRowIdColumn = -2;
             mDataValid = false;
             notifyDataSetChanged();
         }
@@ -247,6 +245,15 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
 
     public MSLViewAdapter getAdapter() {
         return MSLViewAdapter.this;
+    }
+
+    public boolean changePriority(int position) {
+        boolean newPriority;
+        MSLRowView row = mRows.get(position);
+
+        newPriority = !row.getPriority();
+        row.setPriority(newPriority);
+        return newPriority;
     }
 
     private class MSLDataSetObserver extends DataSetObserver {
@@ -272,9 +279,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         Button btnFind, btnDone, btnCancel;
         EditText edit;
 
-        private final ListRowBinding binding;
-
-        public ViewHolder(View itemView, ListRowBinding binding) {
+        public ViewHolder(View itemView) {
             super(itemView);
             icon = itemView.findViewById(R.id.icon);
             label = itemView.findViewById(R.id.label);
@@ -291,14 +296,6 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             btnCancel = expanded.findViewById(R.id.cancel);
             btnCancel.setOnClickListener(cancelClickListener());
             edit = expanded.findViewById(R.id.edit_label);
-
-            this.binding = binding;
-
-        }
-
-        public void bind(boolean priority) {
-            binding.setPriority(priority);
-            binding.executePendingBindings();
         }
 
         private View.OnClickListener findClickListener() {
@@ -328,12 +325,19 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
                     String note = ((EditText) itemView.findViewById(R.id.edit_notes)).getText().toString();
                     String price = ((EditText) itemView.findViewById(R.id.edit_price)).getText().toString();
 
+                    boolean priority = false;
+                    String icon = (itemView.findViewById(R.id.icon)).getTag().toString();
+                    if(icon.equalsIgnoreCase("ic_priority_red_300_48dp")){
+                        priority = true;
+                    }
+
                     int position = getAdapterPosition();
                     MSLViewAdapter adapter = getAdapter();
                     ContentValues cv = new ContentValues();
                     cv.put(MSLTable.COLUMN_LABEL, label);
                     cv.put(MSLTable.COLUMN_NOTE, note);
                     cv.put(MSLTable.COLUMN_PRICE, price);
+                    cv.put(MSLTable.COLUMN_PRIORITY, priority);
 
                     mContext.getContentResolver().update(
                             MSLContentProvider.CONTENT_URI,
