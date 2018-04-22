@@ -191,7 +191,8 @@ public class MSLViewFragment extends Fragment
                 MSLTable.COLUMN_ID,
                 MSLTable.COLUMN_LABEL,
                 MSLTable.COLUMN_NOTE,
-                MSLTable.COLUMN_PRICE};
+                MSLTable.COLUMN_PRICE,
+                MSLTable.COLUMN_PRIORITY};
         return new CursorLoader(getActivity(),
                 MSLContentProvider.CONTENT_URI, projection, null, null, null);
     }

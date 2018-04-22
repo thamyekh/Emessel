@@ -9,6 +9,7 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableInt;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +57,6 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     private int mExpandedPosition = -1;
 
     public final ObservableInt observableInt = new ObservableInt();
-    public final ObservableBoolean isPriority = new ObservableBoolean();
 
     private List<MSLRowView> mRows = new ArrayList<>();
     private Set<Long> mDeleteSet = new LinkedHashSet<>();
@@ -64,7 +64,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     public MSLViewAdapter(Context context, Cursor cursor) {
         mContext = context;
         mCursor = cursor;
-        mRowIdColumn = mDataValid ? mCursor.getColumnIndex(MSLTable.COLUMN_ID) : -2;
+        mRowIdColumn = mDataValid ? mCursor.getColumnIndex(MSLTable.COLUMN_ID) : -1;
         mDataSetObserver = new MSLDataSetObserver();
         if (mCursor != null) {
             mCursor.registerDataSetObserver(mDataSetObserver);
@@ -78,8 +78,9 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         View itemView = layoutInflater.inflate(R.layout.list_row, parent, false);
 
         ListRowBinding listRowBinding = DataBindingUtil.inflate(layoutInflater, R.layout.list_row, parent, false);
-        listRowBinding.setAdapter(getAdapter());
-        return new ViewHolder(itemView);
+        ViewHolder holder = new ViewHolder(itemView);
+//        listRowBinding.setHolder(holder);
+        return holder;
     }
 
     @Override
@@ -102,11 +103,8 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             holder.icon.setImageResource(R.drawable.ic_check_circle_black_48dp);
         } else {
             holder.itemView.setSelected(false);
-//            if (current.getPriority()) TODO: Remove
-//                holder.icon.setImageResource(R.drawable.ic_priority_red_300_48dp);
-//            else
-//                holder.icon.setImageResource(R.drawable.ic_priority_light_blue_300_48dp);
-            isPriority.set(current.getPriority());
+            holder.isPriority.set(current.getPriority());
+            holder.getBinding().setHolder(holder);
         }
     }
 
@@ -158,8 +156,8 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
                     mslItem.setPrice(price);
                 }
                 if (!cursor.isNull(cursor.getColumnIndex(MSLTable.COLUMN_PRIORITY))) {
-                    boolean priority = (cursor.getInt(cursor
-                            .getColumnIndex(MSLTable.COLUMN_PRIORITY)) == 1);
+                    boolean priority = (cursor.getString(cursor
+                            .getColumnIndex(MSLTable.COLUMN_PRIORITY)).equals("true"));
                     mslItem.setPriority(priority);
                 }
 
@@ -228,7 +226,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
                 notifyDataSetChanged();
             }
         } else {
-            mRowIdColumn = -2;
+            mRowIdColumn = -1;
             mDataValid = false;
             notifyDataSetChanged();
         }
@@ -248,12 +246,10 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
     }
 
     public boolean changePriority(int position) {
-        boolean newPriority;
         MSLRowView row = mRows.get(position);
-
-        newPriority = !row.getPriority();
-        row.setPriority(newPriority);
-        return newPriority;
+        row.setPriority(!row.getPriority());
+        mRows.set(position, row);
+        return row.getPriority();
     }
 
     private class MSLDataSetObserver extends DataSetObserver {
@@ -279,6 +275,9 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
         Button btnFind, btnDone, btnCancel;
         EditText edit;
 
+        ListRowBinding binding;
+        public final ObservableBoolean isPriority = new ObservableBoolean();
+
         public ViewHolder(View itemView) {
             super(itemView);
             icon = itemView.findViewById(R.id.icon);
@@ -296,6 +295,12 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
             btnCancel = expanded.findViewById(R.id.cancel);
             btnCancel.setOnClickListener(cancelClickListener());
             edit = expanded.findViewById(R.id.edit_label);
+
+            this.binding = DataBindingUtil.bind(itemView);
+        }
+
+        public ListRowBinding getBinding() {
+            return binding;
         }
 
         private View.OnClickListener findClickListener() {
@@ -327,9 +332,11 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
 
                     boolean priority = false;
                     String icon = (itemView.findViewById(R.id.icon)).getTag().toString();
-                    if(icon.equalsIgnoreCase("ic_priority_red_300_48dp")){
+                    if (icon.equalsIgnoreCase("ic_priority_red_300_48dp")) {
                         priority = true;
                     }
+
+                    Log.d("doneClick priority", String.valueOf(priority));
 
                     int position = getAdapterPosition();
                     MSLViewAdapter adapter = getAdapter();
@@ -337,7 +344,7 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
                     cv.put(MSLTable.COLUMN_LABEL, label);
                     cv.put(MSLTable.COLUMN_NOTE, note);
                     cv.put(MSLTable.COLUMN_PRICE, price);
-                    cv.put(MSLTable.COLUMN_PRIORITY, priority);
+                    cv.put(MSLTable.COLUMN_PRIORITY, String.valueOf(priority));
 
                     mContext.getContentResolver().update(
                             MSLContentProvider.CONTENT_URI,

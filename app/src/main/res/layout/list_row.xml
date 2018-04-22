@@ -5,11 +5,11 @@
 
         <import type="android.view.View" />
 
-        <import type="com.smurfee.android.emessel.recyclerview.MSLViewAdapter" />
+        <import type="com.smurfee.android.emessel.recyclerview.MSLViewAdapter.ViewHolder" />
 
         <variable
-            name="adapter"
-            type="MSLViewAdapter" />
+            name="holder"
+            type="ViewHolder" />
 
     </data>
 
@@ -27,8 +27,8 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="24dp"
             android:layout_marginStart="24dp"
-            android:src="@{adapter.isPriority ? @drawable/ic_priority_red_300_48dp : @drawable/ic_priority_light_blue_300_48dp}"
-            android:tag="@{adapter.isPriority ? @string/priority_high : @string/priority_low}" />
+            android:src="@{holder.isPriority ? @drawable/ic_priority_red_300_48dp : @drawable/ic_priority_light_blue_300_48dp}"
+            android:tag="@{holder.isPriority ? @string/priority_high : @string/priority_low}" />
         <!-- android:src="@drawable/ic_priority_light_blue_300_48dp" /> -->
 
         <TextView

@@ -22,7 +22,6 @@ import com.smurfee.android.emessel.recyclerview.MSLViewFragment;
 
 /**
  * TODO(s):
- * webscrape
  * sms shopping list
  * calculate total shopping list cost
  */
