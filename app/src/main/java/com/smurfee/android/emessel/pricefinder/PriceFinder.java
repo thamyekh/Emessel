@@ -112,7 +112,4 @@ public class PriceFinder extends AsyncTask<String, Void, String[]> {
         else
             return s + ".";
     }
-//    private void print(String msg, Object... args) {
-//        Log.d("JSoup", String.format(msg, args));
-//    }
 }

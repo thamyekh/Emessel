@@ -3,14 +3,12 @@ package com.smurfee.android.emessel.swipe;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,9 +29,11 @@ public class MSLCallback extends ItemTouchHelper.Callback {
 
     private Paint paint = new Paint();
     private MSLViewAdapter mAdapter;
+    private Resources resource;
 
-    public MSLCallback(MSLViewAdapter Adapter) {
-        mAdapter = Adapter;
+    public MSLCallback(MSLViewAdapter adapter) {
+        mAdapter = adapter;
+        resource = adapter.getContext().getResources();
     }
 
     @Override
@@ -63,7 +63,6 @@ public class MSLCallback extends ItemTouchHelper.Callback {
             if (newPriority)
                 icon.setTag("ic_priority_red_300_48dp");
             else icon.setTag("ic_priority_light_blue_300_48dp");
-            Log.d("priority",String.valueOf(newPriority));
 
             TextView label = viewHolder.itemView.findViewById(R.id.label);
             ((EditText) viewHolder.itemView.findViewById(R.id.edit_label)).setText(label.getText());
@@ -79,44 +78,63 @@ public class MSLCallback extends ItemTouchHelper.Callback {
 
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
 //            Bitmap icon;
-            float left, top, right, bottom;
-            Resources resource = mAdapter.getContext().getResources();
             View itemView = viewHolder.itemView;
-            float height = (float) itemView.getBottom() - (float) itemView.getTop();
-            float width = height / 3;
-            if (dX > 0) {
-                paint.setColor(Color.parseColor("#E5E5E5"));
-                paint.setTextSize((float) 50);
-                RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX, (float) itemView.getBottom());
-                c.drawRect(background, paint);
-                paint.setColor(Color.parseColor("#388E3C"));
-                c.drawText("Priority Changed", (float) itemView.getLeft() + width, (float) itemView.getTop() + 2 * width, paint);
-//                icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_edit_white);
-                RectF icon_dest = new RectF((float) itemView.getLeft() + width, (float) itemView.getTop() + width, (float) itemView.getLeft() + 2 * width, (float) itemView.getBottom() - width);
-//                c.drawBitmap(icon,null,icon_dest,paint);
-            } else {
+            float left, right;
+            float top = (float) itemView.getTop();
+            float bottom = (float) itemView.getBottom();
+
+            if (dX > 0) {   // swipe right for priority-change
+                left = (float) itemView.getLeft();
+                right = (float) itemView.getRight() + dX;
+                drawSwipeRight(c, left, top, right, bottom, itemView);
+            } else {        // swipe left for find-price
                 left = (float) itemView.getRight() + dX;
-                top = (float) itemView.getTop();
                 right = (float) itemView.getRight();
-                bottom = (float) itemView.getBottom();
-                paint.setColor(ResourcesCompat.getColor(resource, R.color.accent, null));
-
-                RectF background = new RectF(left, top, right, bottom);
-                c.drawRect(background, paint);
-
-
-                left = (float) itemView.getRight() - 2 * width;
-                top = (float) itemView.getTop() + width;
-                right = (float) itemView.getRight() - width;
-                bottom = (float) itemView.getBottom() - width;
-
-                Drawable d = resource.getDrawable(R.drawable.ic_swipe_left);
-                d.setBounds((int) left, (int) top, (int) right, (int) bottom);
-                d.draw(c);
+                drawSwipeLeft(c, left, top, right, bottom, itemView);
             }
         }
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
     }
+
+    private void drawSwipeRight(Canvas c, float left, float top, float right, float bottom, View itemView) {
+        float height = (float) itemView.getBottom() - (float) itemView.getTop();
+        float width = height / 3;
+
+        paint.setColor(ResourcesCompat.getColor(resource, R.color.priority, null));
+
+        RectF background = new RectF(left, top, right, bottom);
+        c.drawRect(background, paint);
+
+        left = (float) itemView.getLeft() + width;
+        top = (float) itemView.getTop() + width;
+        right = (float) itemView.getLeft() + 2 * width;
+        bottom = (float) itemView.getBottom() - width;
+
+        Drawable d = resource.getDrawable(R.drawable.ic_swipe_right);
+        d.setBounds((int) left, (int) top, (int) right, (int) bottom);
+        d.draw(c);
+    }
+
+    private void drawSwipeLeft(Canvas c, float left, float top, float right, float bottom, View itemView) {
+        float height = (float) itemView.getBottom() - (float) itemView.getTop();
+        float width = height / 3;
+
+        paint.setColor(ResourcesCompat.getColor(resource, R.color.accent, null));
+
+        RectF background = new RectF(left, top, right, bottom);
+        c.drawRect(background, paint);
+
+
+        left = (float) itemView.getRight() - 2 * width;
+        top = (float) itemView.getTop() + width;
+        right = (float) itemView.getRight() - width;
+        bottom = (float) itemView.getBottom() - width;
+
+        Drawable d = resource.getDrawable(R.drawable.ic_swipe_left);
+        d.setBounds((int) left, (int) top, (int) right, (int) bottom);
+        d.draw(c);
+    }
+
 
     @Override
     public boolean isItemViewSwipeEnabled() {

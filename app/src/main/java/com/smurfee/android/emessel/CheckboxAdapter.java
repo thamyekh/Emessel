@@ -2,15 +2,12 @@ package com.smurfee.android.emessel;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
-
-import java.util.Arrays;
 
 /**
  * Created by Yek on 24/06/2017.
@@ -49,7 +46,6 @@ public class CheckboxAdapter extends ArrayAdapter {
                 CheckBox cb = (CheckBox) finalConvertView.findViewById(checkBoxId);
                 markedForDeletion[position] = !markedForDeletion[position];
                 cb.setChecked(markedForDeletion[position]);
-                Log.d("check click", Arrays.toString(markedForDeletion));
             }
         });
         textView.setText(dbFiles[position]);
@@ -57,7 +53,6 @@ public class CheckboxAdapter extends ArrayAdapter {
     }
 
     public boolean[] getMarkedForDeletion() {
-        Log.d("check", Arrays.toString(markedForDeletion));
         return markedForDeletion;
     }
 }

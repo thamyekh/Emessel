@@ -9,7 +9,6 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableInt;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -146,7 +145,6 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
                 String item = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_LABEL));
                 mslItem = new MSLRowView(id, item);
 
-                //TODO may need to handle null for note and/or price
                 if (!cursor.isNull(cursor.getColumnIndex(MSLTable.COLUMN_NOTE))) {
                     String note = cursor.getString(cursor.getColumnIndex(MSLTable.COLUMN_NOTE));
                     mslItem.setNote(note);
@@ -335,9 +333,6 @@ public class MSLViewAdapter extends RecyclerView.Adapter<MSLViewAdapter.ViewHold
                     if (icon.equalsIgnoreCase("ic_priority_red_300_48dp")) {
                         priority = true;
                     }
-
-                    Log.d("doneClick priority", String.valueOf(priority));
-
                     int position = getAdapterPosition();
                     MSLViewAdapter adapter = getAdapter();
                     ContentValues cv = new ContentValues();

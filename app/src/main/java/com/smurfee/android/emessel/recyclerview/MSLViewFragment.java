@@ -148,11 +148,13 @@ public class MSLViewFragment extends Fragment
         context.getContentResolver().delete(MSLContentProvider.CONTENT_URI, null, null);
     }
 
-    public void saveList(Context context) {
-        /** TODO: CHECKS
-         *  Don't save if the list is already empty
-         *  ensure that you are not allowed to use the word jornal when saving
-         */
+    public void saveList(final Context context) {
+
+        // Don't save if the list is already empty
+        if(mAdapter.getItemCount() == 0){
+            Toast.makeText(context, "no point saving an empty list", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         final EditText input = new EditText(context);
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -163,6 +165,13 @@ public class MSLViewFragment extends Fragment
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String newDBfilename = input.getText().toString();
+
+                // Ensure that you are not allowed to use the word "jornal" when saving
+                if(newDBfilename.equals("") || newDBfilename.contains("jornal")) {
+                    Toast.makeText(context, "didn't save, name it something different", Toast.LENGTH_SHORT).show();
+                    dialog.cancel();
+                    return;
+                }
                 try {
                     File databaseFile = getActivity().getDatabasePath("msl.db");
                     File oldDatabaseFile = new File(databaseFile.getParentFile(), newDBfilename);

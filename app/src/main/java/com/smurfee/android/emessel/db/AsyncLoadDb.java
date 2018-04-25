@@ -3,7 +3,6 @@ package com.smurfee.android.emessel.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,9 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.smurfee.android.emessel.R;
-import com.smurfee.android.emessel.recyclerview.MSLTouchListener;
 import com.smurfee.android.emessel.recyclerview.MSLViewAdapter;
-import com.smurfee.android.emessel.recyclerview.MSLViewFragment;
 
 import java.io.File;
 import java.io.FileInputStream;
